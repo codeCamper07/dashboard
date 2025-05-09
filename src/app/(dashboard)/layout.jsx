@@ -8,12 +8,14 @@ export default async function DashboardLayout({ children }) {
   const defaultOpen = cookieStore.get('sidebar_state')?.value === 'true'
 
   return (
-    <div>
+    <div className='h-screen flex'>
       <SidebarProvider defaultOpen={defaultOpen}>
         <AppSidebar />
         <div className='w-full'>
           <Navbar />
-          <div className='bg-secondary'>{children}</div>
+          <div className='bg-secondary overflow-scroll flex flex-col '>
+            {children}
+          </div>
         </div>
       </SidebarProvider>
     </div>

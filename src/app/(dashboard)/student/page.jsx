@@ -7,7 +7,7 @@ const StudentPage = () => {
     <div className='flex flex-col gap-4 p-4 xl:flex-row'>
       {/* LEFT */}
       <div className='w-full xl:w-2/3 '>
-        <div className='h-full bg-card p-4 rounded-xl'>
+        <div className='h-full bg-card p-5 rounded-xl'>
           <h1 className='text-xl font-semibold'>Schedule (4A)</h1>
           <BigCalendar />
         </div>
