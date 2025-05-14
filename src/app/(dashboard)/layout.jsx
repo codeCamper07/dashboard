@@ -13,7 +13,7 @@ export default async function DashboardLayout({ children }) {
         <AppSidebar />
         <div className='w-full'>
           <Navbar />
-          <div className='bg-secondary overflow-scroll flex flex-col '>
+          <div className='bg-secondary overflow-scroll flex flex-col h-full'>
             {children}
           </div>
         </div>

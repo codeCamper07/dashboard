@@ -1,6 +1,5 @@
 import Announcement from '@/components/Announcement'
 import BigCalendar from '@/components/BigCalendar'
-import React from 'react'
 
 const Teacher = () => {
   return (
