@@ -1,17 +1,14 @@
 import {
   Table,
   TableBody,
-  TableCaption,
-  TableCell,
   TableHead,
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
 
-const TableComponent = ({ columns }) => {
+const TableComponent = ({ columns, data, renderRow }) => {
   return (
     <Table>
-      <TableCaption>A list of your recent invoices.</TableCaption>
       <TableHeader>
         <TableRow>
           {columns.map((col) => {
@@ -23,9 +20,7 @@ const TableComponent = ({ columns }) => {
           })}
         </TableRow>
       </TableHeader>
-      <TableBody>
-        <TableRow></TableRow>
-      </TableBody>
+      <TableBody>{data.map((item) => renderRow(item))}</TableBody>
     </Table>
   )
 }

@@ -2,7 +2,17 @@ import PaginationComponent from '@/components/Pagination'
 import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
-import { ArrowDownWideNarrow, Plus, SlidersHorizontal } from 'lucide-react'
+import { TableCell, TableRow } from '@/components/ui/table'
+import { teachersData } from '@/lib/data'
+import {
+  ArrowDownWideNarrow,
+  FileSymlink,
+  Plus,
+  SlidersHorizontal,
+  Trash2,
+} from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 const columns = [
   {
@@ -42,6 +52,45 @@ const columns = [
 ]
 
 const TeachersListPage = () => {
+  const renderRow = (item) => {
+    return (
+      <TableRow key={item.id}>
+        <TableCell className='flex items-center gap-2'>
+          <Image
+            src={item.photo}
+            alt={item.name}
+            width={40}
+            height={40}
+            className='md:hidden xl:block w-10 h-10 rounded-full object-cover'
+          />
+          <div className='flex flex-col gap-1'>
+            <h3 className='font-bold text-md'>{item.name}</h3>
+            <p className='font-extralight text-sm'>{item?.email}</p>
+          </div>
+        </TableCell>
+        <TableCell className='hidden md:table-cell'>{item.teacherId}</TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {item.subjects.join(', ')}
+        </TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {item.classes.join(', ')}
+        </TableCell>
+        <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
+        <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
+        <TableCell className='flex items-center gap-2 justify-end'>
+          <Link href={`/list/teachers/${item.id}`}>
+            <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
+              <FileSymlink />
+            </Button>
+          </Link>
+          <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
+            <Trash2 />
+          </Button>
+        </TableCell>
+      </TableRow>
+    )
+  }
+
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
       {/* TOP Element */}
@@ -64,7 +113,11 @@ const TeachersListPage = () => {
       </div>
       <div className=''>
         {/* Table */}
-        <TableComponent columns={columns} />
+        <TableComponent
+          columns={columns}
+          data={teachersData}
+          renderRow={renderRow}
+        />
         {/* Pagination */}
         <PaginationComponent />
       </div>
