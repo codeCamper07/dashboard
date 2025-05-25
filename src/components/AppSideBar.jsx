@@ -1,12 +1,18 @@
 'use client'
 import {
-  Calendar,
-  ChevronDown,
+  University,
   Home,
-  Inbox,
-  Search,
-  Settings,
-  StoreIcon,
+  Users,
+  ContactRound,
+  SquareLibrary,
+  LaptopMinimalCheck,
+  NotebookPen,
+  BookText,
+  ListTodo,
+  FileCheck2,
+  ListChecks,
+  Calendar,
+  Megaphone,
 } from 'lucide-react'
 
 import {
@@ -19,41 +25,91 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarMenuSub,
-  SidebarMenuSubButton,
   SidebarSeparator,
 } from '@/components/ui/sidebar'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Collapsible, CollapsibleTrigger } from '@radix-ui/react-collapsible'
-import { CollapsibleContent } from './ui/collapsible'
+import { role } from '@/lib/data'
 
 // Menu items.
 const items = [
   {
     title: 'Home',
-    url: '#',
+    url: `/${role}`,
     icon: Home,
+    visible: ['admin', 'teacher', 'student', 'parent'],
   },
   {
-    title: 'Inbox',
+    title: 'Students',
+    url: '/list/students',
+    icon: Users,
+    visible: ['admin', 'teacher'],
+  },
+  {
+    title: 'Teachers',
+    url: '/list/teachers',
+    icon: University,
+    visible: ['admin', 'teacher'],
+  },
+  {
+    title: 'Parents',
+    url: '/list/parents',
+    icon: ContactRound,
+    visible: ['admin', 'teacher'],
+  },
+  {
+    title: 'Subjects',
+    url: '/list/subjects',
+    icon: SquareLibrary,
+    visible: ['admin'],
+  },
+  {
+    title: 'Classes',
+    url: '/list/classes',
+    icon: LaptopMinimalCheck,
+    visible: ['admin', 'teacher'],
+  },
+  {
+    title: 'Lessons',
     url: '#',
-    icon: Inbox,
+    icon: NotebookPen,
+    visible: ['admin', 'teacher'],
   },
   {
-    title: 'Calendar',
+    title: 'Exam',
+    url: '#',
+    icon: BookText,
+    visible: ['admin', 'teacher', 'student', 'parent'],
+  },
+  {
+    title: 'Assignments',
+    url: '#',
+    icon: ListTodo,
+    visible: ['admin', 'teacher', 'student', 'parent'],
+  },
+  {
+    title: 'Results',
+    url: '#',
+    icon: FileCheck2,
+    visible: ['admin', 'teacher', 'student', 'parent'],
+  },
+  {
+    title: 'Attendance',
+    url: '#',
+    icon: ListChecks,
+    visible: ['admin', 'teacher', 'student', 'parent'],
+  },
+  {
+    title: 'Calender',
     url: '#',
     icon: Calendar,
+    visible: ['admin', 'teacher', 'student', 'parent'],
   },
   {
-    title: 'Search',
+    title: 'Announcements',
     url: '#',
-    icon: Search,
-  },
-  {
-    title: 'Settings',
-    url: '#',
-    icon: Settings,
+    icon: Megaphone,
+    visible: ['admin', 'teacher', 'student', 'parent'],
   },
 ]
 
@@ -75,44 +131,26 @@ const AppSidebar = () => {
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {items.map((item) => {
+                if (item.visible.includes(role)) {
+                  return (
+                    <SidebarMenuItem key={item.title}>
+                      <SidebarMenuButton asChild>
+                        <a href={item.url}>
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </a>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  )
+                }
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
-        <Collapsible defaultOpen={false} className='group/collapsible'>
-          <SidebarGroup>
-            <SidebarGroupLabel asChild>
-              <CollapsibleTrigger>
-                Project
-                <ChevronDown className='ml-auto transition-transform group-data-[state=open]/collapsible:rotate-180' />
-              </CollapsibleTrigger>
-            </SidebarGroupLabel>
-            <CollapsibleContent>
-              <SidebarMenu>
-                <SidebarMenuSub>
-                  <SidebarMenuSubButton asChild>
-                    <a>
-                      <StoreIcon />
-                      <span>DevStore</span>
-                    </a>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSub>
-              </SidebarMenu>
-            </CollapsibleContent>
-          </SidebarGroup>
-        </Collapsible>
       </SidebarContent>
     </Sidebar>
   )
