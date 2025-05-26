@@ -13,6 +13,7 @@ import {
   ListChecks,
   Calendar,
   Megaphone,
+  CalendarHeart,
 } from 'lucide-react'
 
 import {
@@ -71,25 +72,25 @@ const items = [
   },
   {
     title: 'Lessons',
-    url: '#',
+    url: '/list/lessons',
     icon: NotebookPen,
     visible: ['admin', 'teacher'],
   },
   {
     title: 'Exam',
-    url: '#',
+    url: '/list/exams',
     icon: BookText,
     visible: ['admin', 'teacher', 'student', 'parent'],
   },
   {
     title: 'Assignments',
-    url: '#',
+    url: '/list/assignments',
     icon: ListTodo,
     visible: ['admin', 'teacher', 'student', 'parent'],
   },
   {
     title: 'Results',
-    url: '#',
+    url: '/list/results',
     icon: FileCheck2,
     visible: ['admin', 'teacher', 'student', 'parent'],
   },
@@ -106,8 +107,14 @@ const items = [
     visible: ['admin', 'teacher', 'student', 'parent'],
   },
   {
+    title: 'Events',
+    url: '/list/events',
+    icon: CalendarHeart,
+    visible: ['admin', 'teacher', 'student', 'parent'],
+  },
+  {
     title: 'Announcements',
-    url: '#',
+    url: '/list/announcements',
     icon: Megaphone,
     visible: ['admin', 'teacher', 'student', 'parent'],
   },

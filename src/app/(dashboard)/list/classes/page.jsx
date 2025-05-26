@@ -60,7 +60,7 @@ const ClassesListPage = () => {
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
       {/* TOP Element */}
       <div className='flex items-center justify-between'>
-        <h1 className='hidden md:block font-semibold text-lg'>All Parents</h1>
+        <h1 className='hidden md:block font-semibold text-lg'>All Classes</h1>
         <div className='flex flex-col md:flex-row gap-4 items-center w-full md:w-auto'>
           <TableSearch />
           <div className='flex items-center gap-4 self-end'>
