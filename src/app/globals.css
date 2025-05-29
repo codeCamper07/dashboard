@@ -140,7 +140,7 @@
 .rbc-toolbar button.rbc-active {
   box-shadow: none !important;
   background-color: var(--color-accent) !important;
-  color: var(--color-primary) !important;
+  color: var(--color-accent-foreground) !important;
 }
 .rbc-time-view {
   border-color: var(--color-gray-300) !important;
