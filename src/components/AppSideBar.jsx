@@ -145,7 +145,7 @@ const AppSidebar = () => {
                 if (item.visible.includes(role)) {
                   return (
                     <SidebarMenuItem key={item.title}>
-                      <SidebarMenuButton asChild>
+                      <SidebarMenuButton tooltip={item.title} asChild>
                         <a href={item.url}>
                           <item.icon />
                           <span>{item.title}</span>

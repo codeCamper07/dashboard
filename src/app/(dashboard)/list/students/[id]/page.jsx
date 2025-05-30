@@ -14,7 +14,7 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 
-const SingleTeacherPage = () => {
+const SingleStudentPage = () => {
   return (
     <div className='flex-1 p-4 flex flex-col gap-4 lg:flex-row'>
       {/* Left */}
@@ -25,7 +25,7 @@ const SingleTeacherPage = () => {
           <div className='flex-1 flex gap-4 px-4 py-4 rounded-md bg-sky-400'>
             <div className='w-1/3'>
               <Image
-                src='https://images.pexels.com/photos/2888150/pexels-photo-2888150.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                src='https://images.pexels.com/photos/1102341/pexels-photo-1102341.jpeg?auto=compress&cs=tinysrgb&w=1200'
                 alt='profileImg'
                 width={140}
                 height={140}
@@ -33,7 +33,7 @@ const SingleTeacherPage = () => {
               />
             </div>
             <div className='w-2/3 flex flex-col gap-4 justify-between'>
-              <h1 className='text-xl font-bold'>John Doe</h1>
+              <h1 className='text-xl font-bold'>Jan Smith</h1>
               <p className='text-sm'>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
               </p>
@@ -73,8 +73,8 @@ const SingleTeacherPage = () => {
             lg:w-[45%] 2xl:w-[48%]'>
               <ClipboardList className='w-6 h-6' />
               <div>
-                <h1 className='text-lg font-semibold'>2</h1>
-                <p className='text-sm'>Branches</p>
+                <h1 className='text-lg font-semibold'>6th</h1>
+                <p className='text-sm'>Grade</p>
               </div>
             </div>
             <div
@@ -82,7 +82,7 @@ const SingleTeacherPage = () => {
             lg:w-[45%] 2xl:w-[48%]'>
               <NotebookPen className='w-6 h-6' />
               <div>
-                <h1 className='text-lg font-semibold'>6</h1>
+                <h1 className='text-lg font-semibold'>18</h1>
                 <p className='text-sm'>Lessons</p>
               </div>
             </div>
@@ -91,15 +91,15 @@ const SingleTeacherPage = () => {
             lg:w-[45%] 2xl:w-[48%]'>
               <LaptopMinimalCheck className='w-6 h-6' />
               <div>
-                <h1 className='text-lg font-semibold'>6</h1>
-                <p className='text-sm'>Classes</p>
+                <h1 className='text-lg font-semibold'>6A</h1>
+                <p className='text-sm'>Class</p>
               </div>
             </div>
           </div>
         </div>
         {/* Bottom */}
         <div className='mt-4 p-4 bg-card rounded-md h-[800px]'>
-          <h1 className='text-lg font-semibold'>Teacher&apos;s Schedule</h1>
+          <h1 className='text-lg font-semibold'>Student&apos;s Schedule</h1>
           <BigCalendar />
         </div>
       </div>
@@ -110,19 +110,19 @@ const SingleTeacherPage = () => {
           <h1 className='text-lg font-semibold'>Shortcuts</h1>
           <div className='flex flex-wrap gap-4 text-xs mt-4'>
             <Link className='p-3 bg-sky-400 rounded-md' href='/'>
-              Teacher&apos;s Classes
+              Student&apos;s Lessons
             </Link>
             <Link className='p-3 bg-purple-400 rounded-md' href='/'>
-              Teacher&apos;s Students
+              Student&apos;s Teachers
             </Link>
             <Link className='p-3 bg-yellow-400 rounded-md' href='/'>
-              Teacher&apos;s Lesson&apos;s
+              Student&apos; Results
             </Link>
             <Link className='p-3 bg-pink-400 rounded-md' href='/'>
-              Teacher&apos;s Exams
+              Student&apos;s Exams
             </Link>
             <Link className='p-3 bg-sky-400 rounded-md' href='/'>
-              Teacher&apos;s Assignments
+              Student&apos;s Assignments
             </Link>
           </div>
         </div>
@@ -135,4 +135,4 @@ const SingleTeacherPage = () => {
   )
 }
 
-export default SingleTeacherPage
+export default SingleStudentPage

@@ -23,7 +23,7 @@ const events = [
 
 const Announcement = () => {
   return (
-    <div className='flex flex-col gap-4'>
+    <div className='flex flex-col gap-4 bg-card p-4 rounded-md'>
       <div className='flex items-center justify-between'>
         <h1 className='text-foreground font-semibold text-lg'>Announcements</h1>
         <span className='text-sm text-gray-400'>View More</span>
@@ -31,12 +31,14 @@ const Announcement = () => {
       <div className='flex-1 flex flex-col gap-4'>
         {events.map((items) => {
           return (
-            <div className='p-4 rounded-md border-1 bg-card' key={items.id}>
+            <div
+              className='p-4 rounded-md border-1 even:bg-sky-400 odd:bg-purple-400'
+              key={items.id}>
               <div className='flex justify-between items-center'>
                 <h1 className='font-semibold text-primary'>{items.title}</h1>
-                <span className='text-xs text-gray-400'>{items.time}</span>
+                <span className='text-xs'>{items.time}</span>
               </div>
-              <p className='text-sm text-gray-500'>{items.description}</p>
+              <p className='text-sm'>{items.description}</p>
             </div>
           )
         })}

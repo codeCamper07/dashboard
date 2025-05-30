@@ -63,7 +63,9 @@ export function AppCalendar() {
       <div className='flex-1 flex flex-col gap-4'>
         {events.map((items) => {
           return (
-            <div className='p-4 rounded-md border-1 bg-card' key={items.id}>
+            <div
+              className='p-4 rounded-md border-1 border-t-4 even:border-t-sky-200 odd:border-t-purple-200'
+              key={items.id}>
               <div className='flex justify-between items-center'>
                 <h1 className='font-semibold text-primary'>{items.title}</h1>
                 <span className='text-xs text-gray-400'>{items.time}</span>
