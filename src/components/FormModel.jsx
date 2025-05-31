@@ -4,6 +4,7 @@ import React, { useState } from 'react'
 import { Button } from './ui/button'
 import { Plus, SquarePenIcon, Trash } from 'lucide-react'
 import Image from 'next/image'
+import TeacherForm from './forms/TeacherForm'
 
 const FormModel = ({ table, type, data, id }) => {
   const [open, setOpen] = useState(false)
@@ -18,7 +19,7 @@ const FormModel = ({ table, type, data, id }) => {
         <Button className='bg-destructive'>Delete</Button>
       </form>
     ) : (
-      'create or update form'
+      <TeacherForm type={type} />
     )
   }
 
