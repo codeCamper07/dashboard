@@ -1,15 +1,11 @@
+import FormModel from '@/components/FormModel'
 import PaginationComponent from '@/components/Pagination'
 import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { role, subjectsData } from '@/lib/data'
-import {
-  ArrowDownWideNarrow,
-  Plus,
-  SlidersHorizontal,
-  Trash2,
-} from 'lucide-react'
+import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 
 const columns = [
   {
@@ -43,9 +39,10 @@ const SubjectListPage = () => {
         </TableCell>
         <TableCell className='flex items-center gap-2 justify-end'>
           {role === 'admin' && (
-            <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-              <Trash2 />
-            </Button>
+            <>
+              <FormModel type='update' table='subjects' data={item} />
+              <FormModel type='delete' table='subjects' id={item.id} />
+            </>
           )}
         </TableCell>
       </TableRow>
@@ -66,9 +63,14 @@ const SubjectListPage = () => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <Plus />
-            </Button>
+            {role === 'admin' && (
+              // <Button className='rounded-full w-8 h-8 flex items-center justify-center'>
+              //   <Plus />
+              // </Button>
+              <>
+                <FormModel type='create' table='subjects' />
+              </>
+            )}
           </div>
         </div>
       </div>

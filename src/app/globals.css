@@ -170,3 +170,7 @@
   background-color: oklch(0.205 0 0) !important;
   margin: 4px !important;
 }
+
+button {
+  @apply cursor-pointer;
+}

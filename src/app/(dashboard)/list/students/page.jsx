@@ -1,18 +1,12 @@
+import FormModel from '@/components/FormModel'
 import PaginationComponent from '@/components/Pagination'
 import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { role, studentsData } from '@/lib/data'
-import {
-  ArrowDownWideNarrow,
-  FileSymlink,
-  Plus,
-  SlidersHorizontal,
-  Trash2,
-} from 'lucide-react'
+import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
-import Link from 'next/link'
 
 const columns = [
   {
@@ -74,15 +68,14 @@ const StudentListPage = () => {
         <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
         <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
         <TableCell className='flex items-center gap-2 justify-end'>
-          <Link href={`/list/students/${item.id}`}>
-            <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-              <FileSymlink />
-            </Button>
-          </Link>
           {role === 'admin' && (
-            <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-              <Trash2 />
-            </Button>
+            // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
+            //   <Trash2 />
+            // </Button>
+            <>
+              <FormModel type='update' table='student' data={item} />
+              <FormModel type='delete' table='student' id={item.id} />
+            </>
           )}
         </TableCell>
       </TableRow>
@@ -103,9 +96,12 @@ const StudentListPage = () => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <Plus />
-            </Button>
+            {role === 'admin' && (
+              // <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
+              //   <Plus />
+              // </Button>
+              <FormModel type='create' table='student' />
+            )}
           </div>
         </div>
       </div>

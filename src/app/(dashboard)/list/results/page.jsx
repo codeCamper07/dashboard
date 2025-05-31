@@ -1,3 +1,4 @@
+import FormModel from '@/components/FormModel'
 import PaginationComponent from '@/components/Pagination'
 import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
@@ -58,9 +59,10 @@ const ResultListPage = () => {
         <TableCell className='hidden md:table-cell'>{item.date}</TableCell>
         <TableCell className='flex items-center gap-2 justify-end'>
           {role === 'admin' && (
-            <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-              <Trash2 />
-            </Button>
+            <>
+              <FormModel type='update' data={item} table='results' />
+              <FormModel type='delete' id={item.id} table='results' />
+            </>
           )}
         </TableCell>
       </TableRow>
@@ -81,9 +83,7 @@ const ResultListPage = () => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <Plus />
-            </Button>
+            {role === 'admin' && <FormModel type='create' table='results' />}
           </div>
         </div>
       </div>
