@@ -4,7 +4,9 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role, teachersData } from '@/lib/data'
+import { role } from '@/lib/data'
+import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
+import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 
@@ -45,46 +47,61 @@ const columns = [
   },
 ]
 
-const TeachersListPage = () => {
-  const renderRow = (item) => {
-    return (
-      <TableRow key={item.id}>
-        <TableCell className='flex items-center gap-2'>
-          <Image
-            src={item.photo}
-            alt={item.name}
-            width={40}
-            height={40}
-            className='md:hidden xl:block w-10 h-10 rounded-full object-cover'
-          />
-          <div className='flex flex-col gap-1'>
-            <h3 className='font-bold text-md'>{item.name}</h3>
-            <p className='font-extralight text-sm'>{item?.email}</p>
-          </div>
-        </TableCell>
-        <TableCell className='hidden md:table-cell'>{item.teacherId}</TableCell>
-        <TableCell className='hidden md:table-cell'>
-          {item.subjects.join(', ')}
-        </TableCell>
-        <TableCell className='hidden md:table-cell'>
-          {item.classes.join(', ')}
-        </TableCell>
-        <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
-        <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
-        <TableCell className='flex items-center gap-2 justify-end'>
-          {role === 'admin' && (
-            // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-            //   <Trash2 />
-            // </Button>
-            <>
-              <FormModel type='update' table='teacher' data={item} />
-              <FormModel type='delete' table='teacher' id={item.id} />
-            </>
-          )}
-        </TableCell>
-      </TableRow>
-    )
-  }
+const renderRow = (item) => {
+  return (
+    <TableRow key={item.id}>
+      <TableCell className='flex items-center gap-2'>
+        <Image
+          src={item.img || '/noAvatar.png'}
+          alt={item.name}
+          width={40}
+          height={40}
+          className='md:hidden xl:block w-10 h-10 rounded-full object-cover'
+        />
+        <div className='flex flex-col gap-1'>
+          <h3 className='font-bold text-md'>{item.name}</h3>
+          <p className='font-extralight text-sm'>{item?.email}</p>
+        </div>
+      </TableCell>
+      <TableCell className='hidden md:table-cell'>{item.id}</TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {item.subjects.map((subject) => subject.name).join(', ')}
+      </TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {item.classes.map((classList) => classList.name).join(', ')}
+      </TableCell>
+      <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
+      <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
+      <TableCell className='flex items-center gap-2 justify-end'>
+        {role === 'admin' && (
+          // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
+          //   <Trash2 />
+          // </Button>
+          <>
+            <FormModel type='update' table='teacher' data={item} />
+            <FormModel type='delete' table='teacher' id={item.id} />
+          </>
+        )}
+      </TableCell>
+    </TableRow>
+  )
+}
+
+const TeachersListPage = async ({ searchParams }) => {
+  const { page, ...queryParams } = await searchParams
+  let p = page ? parseInt(page) : 1
+
+  const [data, count] = await prisma.$transaction([
+    prisma.teacher.findMany({
+      include: {
+        subjects: true,
+        classes: true,
+      },
+      take: ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE * (p - 1),
+    }),
+    prisma.teacher.count(),
+  ])
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
@@ -111,13 +128,9 @@ const TeachersListPage = () => {
       </div>
       <div className=''>
         {/* Table */}
-        <TableComponent
-          columns={columns}
-          data={teachersData}
-          renderRow={renderRow}
-        />
+        <TableComponent columns={columns} data={data} renderRow={renderRow} />
         {/* Pagination */}
-        <PaginationComponent />
+        <PaginationComponent page={p} count={count} />
       </div>
     </div>
   )
