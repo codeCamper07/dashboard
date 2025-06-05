@@ -9,13 +9,28 @@ import {
   PaginationPrevious,
 } from '@/components/ui/pagination'
 import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
+import { useRouter } from 'next/navigation'
 
 const PaginationComponent = ({ page, count }) => {
+  const router = useRouter()
+
+  const checkPrev = ITEMS_PER_PAGE * (page - 1) > 0
+  const checkNxt = ITEMS_PER_PAGE * (page - 1) + ITEMS_PER_PAGE < count
+
+  const changePage = (newPage) => {
+    const params = new URLSearchParams(window.location.search)
+    params.set('page', newPage.toString())
+    router.push(`${window.location.pathname}?${params}`)
+  }
+
   return (
     <Pagination>
       <PaginationContent>
         <PaginationItem>
-          <PaginationPrevious href='#' />
+          <PaginationPrevious
+            className={`${!checkPrev ? 'hidden' : ''} cursor-pointer`}
+            onClick={() => changePage(page - 1)}
+          />
         </PaginationItem>
         <PaginationItem>
           {Array.from(
@@ -26,9 +41,10 @@ const PaginationComponent = ({ page, count }) => {
               const pageIndex = Index + 1
               return (
                 <PaginationLink
+                  className='cursor-pointer'
                   isActive={page === pageIndex}
                   key={pageIndex}
-                  href='#'>
+                  onClick={() => changePage(pageIndex)}>
                   {pageIndex}
                 </PaginationLink>
               )
@@ -36,7 +52,10 @@ const PaginationComponent = ({ page, count }) => {
           )}
         </PaginationItem>
         <PaginationItem>
-          <PaginationNext href='#' />
+          <PaginationNext
+            className={`${!checkNxt ? 'hidden' : ''} cursor-pointer`}
+            onClick={() => changePage(page + 1)}
+          />
         </PaginationItem>
       </PaginationContent>
     </Pagination>

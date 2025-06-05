@@ -5,6 +5,9 @@ import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { role, studentsData } from '@/lib/data'
+import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
+import { prisma } from '@/lib/prisma'
+import { skip } from '@prisma/client/runtime/library'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 
@@ -44,44 +47,57 @@ const columns = [
     className: 'text-right',
   },
 ]
+const renderRow = (item) => {
+  return (
+    <TableRow key={item.id}>
+      <TableCell className='flex items-center gap-2'>
+        <Image
+          src={item.img || '/noAvatar.png'}
+          alt={item.name}
+          width={40}
+          height={40}
+          className='md:hidden xl:block w-10 h-10 rounded-full object-cover'
+        />
+        <div className='flex flex-col gap-1'>
+          <h3 className='font-bold text-md'>{item.name}</h3>
+          <p className='font-extralight text-sm'>{item?.email}</p>
+        </div>
+      </TableCell>
+      <TableCell className='hidden md:table-cell'>{item.id}</TableCell>
+      <TableCell className='hidden md:table-cell'>{item.class.name}</TableCell>
+      <TableCell className='hidden md:table-cell'>{item.grade.level}</TableCell>
+      <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
+      <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
+      <TableCell className='flex items-center gap-2 justify-end'>
+        {role === 'admin' && (
+          // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
+          //   <Trash2 />
+          // </Button>
+          <>
+            <FormModel type='update' table='student' data={item} />
+            <FormModel type='delete' table='student' id={item.id} />
+          </>
+        )}
+      </TableCell>
+    </TableRow>
+  )
+}
 
-const StudentListPage = () => {
-  const renderRow = (item) => {
-    return (
-      <TableRow key={item.id}>
-        <TableCell className='flex items-center gap-2'>
-          <Image
-            src={item.photo}
-            alt={item.name}
-            width={40}
-            height={40}
-            className='md:hidden xl:block w-10 h-10 rounded-full object-cover'
-          />
-          <div className='flex flex-col gap-1'>
-            <h3 className='font-bold text-md'>{item.name}</h3>
-            <p className='font-extralight text-sm'>{item?.email}</p>
-          </div>
-        </TableCell>
-        <TableCell className='hidden md:table-cell'>{item.studentId}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.class}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.grade}</TableCell>
-        <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
-        <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
-        <TableCell className='flex items-center gap-2 justify-end'>
-          {role === 'admin' && (
-            // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-            //   <Trash2 />
-            // </Button>
-            <>
-              <FormModel type='update' table='student' data={item} />
-              <FormModel type='delete' table='student' id={item.id} />
-            </>
-          )}
-        </TableCell>
-      </TableRow>
-    )
-  }
+const StudentListPage = async ({ searchParams }) => {
+  const { page, ...queryParams } = await searchParams
+  let p = page ? parseInt(page) : 1
 
+  const [data, count] = await prisma.$transaction([
+    prisma.student.findMany({
+      include: {
+        class: true,
+        grade: true,
+      },
+      take: ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE * (p - 1),
+    }),
+    prisma.student.count(),
+  ])
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
       {/* TOP Element */}
@@ -107,13 +123,9 @@ const StudentListPage = () => {
       </div>
       <div className=''>
         {/* Table */}
-        <TableComponent
-          columns={columns}
-          data={studentsData}
-          renderRow={renderRow}
-        />
+        <TableComponent columns={columns} data={data} renderRow={renderRow} />
         {/* Pagination */}
-        <PaginationComponent />
+        <PaginationComponent page={p} count={count} />
       </div>
     </div>
   )
