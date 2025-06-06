@@ -4,10 +4,9 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role, studentsData } from '@/lib/data'
+import { role } from '@/lib/data'
 import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
 import { prisma } from '@/lib/prisma'
-import { skip } from '@prisma/client/runtime/library'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 
@@ -87,8 +86,25 @@ const StudentListPage = async ({ searchParams }) => {
   const { page, ...queryParams } = await searchParams
   let p = page ? parseInt(page) : 1
 
+  const query = {}
+
+  if (queryParams) {
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value !== undefined) {
+        switch (key) {
+          case 'search':
+            query.name = {
+              contains: value,
+              mode: 'insensitive',
+            }
+        }
+      }
+    }
+  }
+
   const [data, count] = await prisma.$transaction([
     prisma.student.findMany({
+      where: query,
       include: {
         class: true,
         grade: true,
@@ -96,7 +112,9 @@ const StudentListPage = async ({ searchParams }) => {
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
     }),
-    prisma.student.count(),
+    prisma.student.count({
+      where: query,
+    }),
   ])
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>

@@ -91,8 +91,34 @@ const TeachersListPage = async ({ searchParams }) => {
   const { page, ...queryParams } = await searchParams
   let p = page ? parseInt(page) : 1
 
+  const query = {}
+
+  if (queryParams) {
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value !== undefined) {
+        switch (key) {
+          case 'classId':
+            query.lessons = {
+              some: {
+                classId: parseInt(value),
+              },
+            }
+            break
+
+          case 'search':
+            query.name = {
+              contains: value,
+              mode: 'insensitive',
+            }
+            break
+        }
+      }
+    }
+  }
+
   const [data, count] = await prisma.$transaction([
     prisma.teacher.findMany({
+      where: query,
       include: {
         subjects: true,
         classes: true,
@@ -100,7 +126,9 @@ const TeachersListPage = async ({ searchParams }) => {
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
     }),
-    prisma.teacher.count(),
+    prisma.teacher.count({
+      where: query,
+    }),
   ])
 
   return (

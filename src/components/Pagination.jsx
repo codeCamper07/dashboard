@@ -28,7 +28,7 @@ const PaginationComponent = ({ page, count }) => {
       <PaginationContent>
         <PaginationItem>
           <PaginationPrevious
-            className={`${!checkPrev ? 'hidden' : ''} cursor-pointer`}
+            className={`${!checkPrev ? 'invisible' : ''} cursor-pointer`}
             onClick={() => changePage(page - 1)}
           />
         </PaginationItem>
@@ -53,7 +53,7 @@ const PaginationComponent = ({ page, count }) => {
         </PaginationItem>
         <PaginationItem>
           <PaginationNext
-            className={`${!checkNxt ? 'hidden' : ''} cursor-pointer`}
+            className={`${!checkNxt ? 'invisible' : ''} cursor-pointer`}
             onClick={() => changePage(page + 1)}
           />
         </PaginationItem>
