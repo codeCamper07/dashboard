@@ -59,11 +59,13 @@ const renderRow = (item) => {
         />
         <div className='flex flex-col gap-1'>
           <h3 className='font-bold text-md'>{item.name}</h3>
-          <p className='font-extralight text-sm'>{item?.email}</p>
+          <p className='font-extralight text-sm'>{item.class.name}</p>
         </div>
       </TableCell>
       <TableCell className='hidden md:table-cell'>{item.id}</TableCell>
-      <TableCell className='hidden md:table-cell'>{item.class.name}</TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {item.class.name[0]}
+      </TableCell>
       <TableCell className='hidden md:table-cell'>{item.grade.level}</TableCell>
       <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
       <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
@@ -96,6 +98,15 @@ const StudentListPage = async ({ searchParams }) => {
             query.name = {
               contains: value,
               mode: 'insensitive',
+            }
+            break
+          case 'teacherId':
+            query.class = {
+              lessons: {
+                some: {
+                  teacherId: value,
+                },
+              },
             }
         }
       }
