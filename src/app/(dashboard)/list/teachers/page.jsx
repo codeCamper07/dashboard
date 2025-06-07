@@ -7,8 +7,9 @@ import { TableCell, TableRow } from '@/components/ui/table'
 import { role } from '@/lib/data'
 import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
 import { prisma } from '@/lib/prisma'
-import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
+import { ArrowDownWideNarrow, Book, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 
 const columns = [
   {
@@ -77,6 +78,11 @@ const renderRow = (item) => {
           //   <Trash2 />
           // </Button>
           <div className='flex gap-2'>
+            <Link href={`/list/teachers/${item.id}`}>
+              <Button className='flex items-center justify-center rounded-full w-7 h-7'>
+                <Book />
+              </Button>
+            </Link>
             <FormModel type='update' table='teacher' data={item} />
             <FormModel type='delete' table='teacher' id={item.id} />
           </div>

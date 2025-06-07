@@ -5,12 +5,7 @@ import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { role, resultsData } from '@/lib/data'
-import {
-  ArrowDownWideNarrow,
-  Plus,
-  SlidersHorizontal,
-  Trash2,
-} from 'lucide-react'
+import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 
 const columns = [
   {

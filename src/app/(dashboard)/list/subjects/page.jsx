@@ -4,7 +4,9 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role, subjectsData } from '@/lib/data'
+import { role } from '@/lib/data'
+import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
+import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 
 const columns = [
@@ -26,27 +28,60 @@ const columns = [
     accessor: 'action',
   },
 ]
+const renderRow = (item) => {
+  return (
+    <TableRow key={item.id}>
+      <TableCell>{item.id}</TableCell>
+      <TableCell>{item.name}</TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {item.teachers.map((teacher) => teacher.name).join(',')}
+      </TableCell>
+      <TableCell className='table-cell'>
+        {role === 'admin' && (
+          <div className='flex gap-2'>
+            <FormModel type='update' table='subjects' data={item} />
+            <FormModel type='delete' table='subjects' id={item.id} />
+          </div>
+        )}
+      </TableCell>
+    </TableRow>
+  )
+}
 
-const SubjectListPage = () => {
-  const renderRow = (item) => {
-    return (
-      <TableRow key={item.id}>
-        <TableCell>{item.id}</TableCell>
-        <TableCell>{item.name}</TableCell>
-        <TableCell className='hidden md:table-cell'>
-          {item.teachers.join(', ')}
-        </TableCell>
-        <TableCell className='table-cell'>
-          {role === 'admin' && (
-            <div className='flex gap-2'>
-              <FormModel type='update' table='subjects' data={item} />
-              <FormModel type='delete' table='subjects' id={item.id} />
-            </div>
-          )}
-        </TableCell>
-      </TableRow>
-    )
+const SubjectListPage = async ({ searchParams }) => {
+  const { page, ...queryParams } = await searchParams
+  const p = page ? parseInt(page) : 1
+
+  const query = {}
+
+  if (queryParams) {
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value !== undefined) {
+        switch (key) {
+          case 'search':
+            query.name = {
+              contains: value,
+              mode: 'insensitive',
+            }
+            break
+        }
+      }
+    }
   }
+
+  const [data, count] = await prisma.$transaction([
+    prisma.subject.findMany({
+      where: query,
+      include: {
+        teachers: true,
+      },
+      take: ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE * (p - 1),
+    }),
+    prisma.subject.count({
+      where: query,
+    }),
+  ])
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
@@ -75,13 +110,9 @@ const SubjectListPage = () => {
       </div>
       <div className=''>
         {/* Table */}
-        <TableComponent
-          columns={columns}
-          data={subjectsData}
-          renderRow={renderRow}
-        />
+        <TableComponent columns={columns} data={data} renderRow={renderRow} />
         {/* Pagination */}
-        <PaginationComponent />
+        <PaginationComponent page={p} count={count} />
       </div>
     </div>
   )
