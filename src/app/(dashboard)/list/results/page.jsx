@@ -57,12 +57,12 @@ const ResultListPage = () => {
         <TableCell className='hidden md:table-cell'>{item.teacher}</TableCell>
         <TableCell className='hidden md:table-cell'>{item.class}</TableCell>
         <TableCell className='hidden md:table-cell'>{item.date}</TableCell>
-        <TableCell className='flex items-center gap-2 justify-end'>
+        <TableCell className='table-cell'>
           {role === 'admin' && (
-            <>
+            <div className='flex gap-2'>
               <FormModel type='update' data={item} table='results' />
               <FormModel type='delete' id={item.id} table='results' />
-            </>
+            </div>
           )}
         </TableCell>
       </TableRow>

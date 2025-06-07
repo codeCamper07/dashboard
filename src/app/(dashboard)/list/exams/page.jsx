@@ -28,7 +28,6 @@ const columns = [
   {
     header: 'Actions',
     accessor: 'action',
-    className: 'text-right',
   },
 ]
 
@@ -40,12 +39,12 @@ const ExamListPage = () => {
         <TableCell>{item.class}</TableCell>
         <TableCell className='hidden md:table-cell'>{item.teacher}</TableCell>
         <TableCell>{item.date}</TableCell>
-        <TableCell className='flex items-center gap-2 justify-end'>
+        <TableCell className='table-cell'>
           {role === 'admin' && (
-            <>
+            <div className='flex gap-2'>
               <FormModel type='update' data={item} table='exams' />
               <FormModel type='delete' id={item.id} table='exams' />
-            </>
+            </div>
           )}
         </TableCell>
       </TableRow>

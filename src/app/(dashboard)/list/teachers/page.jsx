@@ -43,7 +43,6 @@ const columns = [
   {
     header: 'Actions',
     accessor: 'action',
-    className: 'text-right',
   },
 ]
 
@@ -72,15 +71,15 @@ const renderRow = (item) => {
       </TableCell>
       <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
       <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
-      <TableCell className='flex items-center gap-2 justify-end'>
+      <TableCell className='table-cell'>
         {role === 'admin' && (
           // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
           //   <Trash2 />
           // </Button>
-          <>
+          <div className='flex gap-2'>
             <FormModel type='update' table='teacher' data={item} />
             <FormModel type='delete' table='teacher' id={item.id} />
-          </>
+          </div>
         )}
       </TableCell>
     </TableRow>

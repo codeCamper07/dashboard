@@ -21,11 +21,6 @@ const columns = [
     className: 'hidden md:table-cell',
   },
   {
-    header: 'Class',
-    accessor: 'class',
-    className: 'hidden md:table-cell',
-  },
-  {
     header: 'Grade',
     accessor: 'grade',
     className: 'hidden md:table-cell',
@@ -43,7 +38,6 @@ const columns = [
   {
     header: 'Actions',
     accessor: 'action',
-    className: 'text-right',
   },
 ]
 const renderRow = (item) => {
@@ -66,18 +60,14 @@ const renderRow = (item) => {
       <TableCell className='hidden md:table-cell'>
         {item.class.name[0]}
       </TableCell>
-      <TableCell className='hidden md:table-cell'>{item.grade.level}</TableCell>
       <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
       <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
-      <TableCell className='flex items-center gap-2 justify-end'>
+      <TableCell className='table-cell'>
         {role === 'admin' && (
-          // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-          //   <Trash2 />
-          // </Button>
-          <>
+          <div className='flex gap-2'>
             <FormModel type='update' table='student' data={item} />
             <FormModel type='delete' table='student' id={item.id} />
-          </>
+          </div>
         )}
       </TableCell>
     </TableRow>
@@ -118,7 +108,6 @@ const StudentListPage = async ({ searchParams }) => {
       where: query,
       include: {
         class: true,
-        grade: true,
       },
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
