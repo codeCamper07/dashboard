@@ -4,7 +4,7 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role, examsData } from '@/lib/data'
+import { role } from '@/lib/data'
 import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
 import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
@@ -41,7 +41,7 @@ const renderRow = (item) => {
         {item.lesson.teacher.name}
       </TableCell>
       <TableCell>
-        {new Date(item.startTime).toLocaleDateString('en-US')}
+        {new Date(item.startTime).toLocaleDateString('en-IN')}
       </TableCell>
       <TableCell className='table-cell'>
         {role === 'admin' && (

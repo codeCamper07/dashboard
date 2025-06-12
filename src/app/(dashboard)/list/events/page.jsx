@@ -4,7 +4,9 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role, eventsData } from '@/lib/data'
+import { role } from '@/lib/data'
+import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
+import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 
 const columns = [
@@ -36,27 +38,72 @@ const columns = [
     accessor: 'action',
   },
 ]
+const renderRow = (item) => {
+  return (
+    <TableRow key={item.id}>
+      <TableCell>{item.title}</TableCell>
+      <TableCell>{item.class.name}</TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {new Date(item.startTime).toLocaleDateString('en-IN')}
+      </TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {new Date(item.startTime).toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })}
+      </TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {new Date(item.endTime).toLocaleTimeString('en-IN', {
+          hour: '2-digit',
+          minute: '2-digit',
+        })}
+      </TableCell>
+      <TableCell className='table-cell'>
+        {role === 'admin' && (
+          <div className='flex gap-2'>
+            <FormModel type='update' data={item} table='events' />
+            <FormModel type='delete' id={item.id} table='events' />
+          </div>
+        )}
+      </TableCell>
+    </TableRow>
+  )
+}
 
-const EventListPage = () => {
-  const renderRow = (item) => {
-    return (
-      <TableRow key={item.id}>
-        <TableCell>{item.title}</TableCell>
-        <TableCell>{item.class}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.date}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.startTime}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.endTime}</TableCell>
-        <TableCell className='table-cell'>
-          {role === 'admin' && (
-            <div className='flex gap-2'>
-              <FormModel type='update' data={item} table='events' />
-              <FormModel type='delete' id={item.id} table='events' />
-            </div>
-          )}
-        </TableCell>
-      </TableRow>
-    )
+const EventListPage = async ({ searchParams }) => {
+  const { page, ...queryParams } = await searchParams
+  const p = page ? parseInt(page) : 1
+
+  const query = {}
+
+  if (queryParams) {
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value !== undefined) {
+        switch (key) {
+          case 'search':
+            query.title = {
+              contains: value,
+              mode: 'insensitive',
+            }
+            break
+          default:
+            break
+        }
+      }
+    }
   }
+
+  const [data, count] = await prisma.$transaction([
+    prisma.event.findMany({
+      where: query,
+      include: { class: { select: { name: true } } },
+      take: ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE * (p - 1),
+    }),
+    prisma.event.count({
+      where: query,
+    }),
+  ])
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
@@ -78,13 +125,9 @@ const EventListPage = () => {
       </div>
       <div className=''>
         {/* Table */}
-        <TableComponent
-          columns={columns}
-          data={eventsData}
-          renderRow={renderRow}
-        />
+        <TableComponent columns={columns} data={data} renderRow={renderRow} />
         {/* Pagination */}
-        <PaginationComponent />
+        <PaginationComponent page={p} count={count} />
       </div>
     </div>
   )

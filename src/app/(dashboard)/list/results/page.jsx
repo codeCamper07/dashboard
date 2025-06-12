@@ -4,7 +4,9 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role, resultsData } from '@/lib/data'
+import { role } from '@/lib/data'
+import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
+import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 
 const columns = [
@@ -41,28 +43,107 @@ const columns = [
     accessor: 'action',
   },
 ]
+const renderRow = (item) => {
+  return (
+    <TableRow key={item.id}>
+      <TableCell>{item.title}</TableCell>
+      <TableCell>{item.studentName + ' ' + item.studentSurname}</TableCell>
+      <TableCell className='hidden md:table-cell'>{item.score}</TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {item.teacherName + ' ' + item.teacherSurname}
+      </TableCell>
+      <TableCell className='hidden md:table-cell'>{item.className}</TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {new Date(item.date).toLocaleDateString('en-IN')}
+      </TableCell>
+      <TableCell className='table-cell'>
+        {role === 'admin' && (
+          <div className='flex gap-2'>
+            <FormModel type='update' data={item} table='results' />
+            <FormModel type='delete' id={item.id} table='results' />
+          </div>
+        )}
+      </TableCell>
+    </TableRow>
+  )
+}
 
-const ResultListPage = () => {
-  const renderRow = (item) => {
-    return (
-      <TableRow key={item.id}>
-        <TableCell>{item.subject}</TableCell>
-        <TableCell>{item.student}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.score}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.teacher}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.class}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.date}</TableCell>
-        <TableCell className='table-cell'>
-          {role === 'admin' && (
-            <div className='flex gap-2'>
-              <FormModel type='update' data={item} table='results' />
-              <FormModel type='delete' id={item.id} table='results' />
-            </div>
-          )}
-        </TableCell>
-      </TableRow>
-    )
+const ResultListPage = async ({ searchParams }) => {
+  const { page, ...queryParams } = await searchParams
+  const p = page ? parseInt(page) : 1
+
+  const query = {}
+
+  if (queryParams) {
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value !== undefined) {
+        switch (key) {
+          case 'studentId':
+            query.studentId = value
+            break
+          case 'search':
+            query.OR = [
+              { exam: { title: { contains: value, mode: 'insensitive' } } },
+              { student: { name: { contains: value, mode: 'insensitive' } } },
+            ]
+            break
+          default:
+            break
+        }
+      }
+    }
   }
+
+  const [dataRes, count] = await prisma.$transaction([
+    prisma.result.findMany({
+      where: query,
+      include: {
+        student: { select: { name: true, surname: true } },
+        exam: {
+          include: {
+            lesson: {
+              select: {
+                class: { select: { name: true } },
+                teacher: { select: { name: true, surname: true } },
+              },
+            },
+          },
+        },
+        assignment: {
+          include: {
+            lesson: {
+              select: {
+                class: { select: { name: true } },
+                teacher: { select: { name: true, surname: true } },
+              },
+            },
+          },
+        },
+      },
+      take: ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE * (p - 1),
+    }),
+    prisma.result.count({ where: query }),
+  ])
+
+  const data = dataRes.map((item) => {
+    const assessment = item.exam || item.assignment
+
+    const isExam = 'startTime' in assessment
+
+    if (!assessment) return null
+    return {
+      id: item.id,
+      title: assessment.title,
+      studentName: item.student.name,
+      studentSurname: item.student.surname,
+      teacherName: assessment.lesson.teacher.name,
+      teacherSurname: assessment.lesson.teacher.surname,
+      score: item.score,
+      className: assessment.lesson.class.name,
+      date: isExam ? assessment.startTime : assessment.startDate,
+    }
+  })
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
@@ -84,13 +165,9 @@ const ResultListPage = () => {
       </div>
       <div className=''>
         {/* Table */}
-        <TableComponent
-          columns={columns}
-          data={resultsData}
-          renderRow={renderRow}
-        />
+        <TableComponent columns={columns} data={data} renderRow={renderRow} />
         {/* Pagination */}
-        <PaginationComponent />
+        <PaginationComponent page={p} count={count} />
       </div>
     </div>
   )

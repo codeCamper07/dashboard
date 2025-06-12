@@ -4,13 +4,10 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role, announcementsData } from '@/lib/data'
-import {
-  ArrowDownWideNarrow,
-  Plus,
-  SlidersHorizontal,
-  Trash2,
-} from 'lucide-react'
+import { role } from '@/lib/data'
+import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
+import { prisma } from '@/lib/prisma'
+import { ArrowDownWideNarrow, Plus, SlidersHorizontal } from 'lucide-react'
 
 const columns = [
   {
@@ -31,25 +28,62 @@ const columns = [
     accessor: 'action',
   },
 ]
+const renderRow = (item) => {
+  return (
+    <TableRow key={item.id}>
+      <TableCell>{item.title}</TableCell>
+      <TableCell>{item.class.name}</TableCell>
+      <TableCell className='hidden md:table-cell'>
+        {new Date(item.date).toLocaleDateString('en-IN')}
+      </TableCell>
+      <TableCell className='table-cell'>
+        {role === 'admin' && (
+          <div className='flex gap-2'>
+            <FormModel type='update' data={item} table='announcements' />
+            <FormModel type='delete' id={item.id} table='announcements' />
+          </div>
+        )}
+      </TableCell>
+    </TableRow>
+  )
+}
 
-const AnnouncementListPage = () => {
-  const renderRow = (item) => {
-    return (
-      <TableRow key={item.id}>
-        <TableCell>{item.title}</TableCell>
-        <TableCell>{item.class}</TableCell>
-        <TableCell className='hidden md:table-cell'>{item.date}</TableCell>
-        <TableCell className='flex items-center gap-2 justify-end'>
-          {role === 'admin' && (
-            <>
-              <FormModel type='update' data={item} table='announcements' />
-              <FormModel type='delete' id={item.id} table='announcements' />
-            </>
-          )}
-        </TableCell>
-      </TableRow>
-    )
+const AnnouncementListPage = async ({ searchParams }) => {
+  const { page, ...queryParams } = await searchParams
+  const p = page ? parseInt(page) : 1
+
+  const query = {}
+
+  if (queryParams) {
+    for (const [key, value] of Object.entries(queryParams)) {
+      if (value !== undefined) {
+        switch (key) {
+          case 'search':
+            query.title = {
+              contains: value,
+              mode: 'insensitive',
+            }
+            break
+          default:
+            break
+        }
+      }
+    }
   }
+
+  const [data, count] = await prisma.$transaction([
+    prisma.announcement.findMany({
+      where: query,
+      include: {
+        class: true,
+      },
+      take: ITEMS_PER_PAGE,
+      skip: ITEMS_PER_PAGE * (p - 1),
+    }),
+    prisma.announcement.count({
+      where: query,
+    }),
+  ])
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
@@ -73,13 +107,9 @@ const AnnouncementListPage = () => {
       </div>
       <div className=''>
         {/* Table */}
-        <TableComponent
-          columns={columns}
-          data={announcementsData}
-          renderRow={renderRow}
-        />
+        <TableComponent columns={columns} data={data} renderRow={renderRow} />
         {/* Pagination */}
-        <PaginationComponent />
+        <PaginationComponent page={p} count={count} />
       </div>
     </div>
   )
