@@ -14,6 +14,7 @@ import {
 import { useTheme } from 'next-themes'
 import { Button } from './ui/button'
 import { SidebarTrigger } from './ui/sidebar'
+import { UserButton } from '@clerk/nextjs'
 
 function Navbar() {
   const { theme, setTheme } = useTheme()
@@ -45,7 +46,9 @@ function Navbar() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <DropdownMenu>
+        <UserButton />
+
+        {/* <DropdownMenu>
           <DropdownMenuTrigger>
             <Avatar>
               <AvatarImage src='https://github.com/shadcn.png' />
@@ -65,7 +68,7 @@ function Navbar() {
               <LogOutIcon className='h-[1.2rem] w-[1.2rem] mr-2' /> Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
-        </DropdownMenu>
+        </DropdownMenu> */}
       </div>
     </div>
   )
