@@ -8,7 +8,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from '@/components/ui/pagination'
-import { ITEMS_PER_PAGE } from '@/lib/paginationSettings'
+import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { cn } from '@/lib/utils'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
