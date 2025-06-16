@@ -1,23 +1,22 @@
 'use client'
 
-import { LogOutIcon, Moon, Settings2, Sun, User2 } from 'lucide-react'
-import React from 'react'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Moon, Sun } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useTheme } from 'next-themes'
 import { Button } from './ui/button'
 import { SidebarTrigger } from './ui/sidebar'
-import { UserButton } from '@clerk/nextjs'
+import { UserButton, useUser } from '@clerk/nextjs'
+import { Skeleton } from './ui/skeleton'
 
 function Navbar() {
   const { theme, setTheme } = useTheme()
+  const { user } = useUser()
+
   return (
     <div className='p-4 flex items-center justify-between'>
       {/*Left Items */}
@@ -46,7 +45,23 @@ function Navbar() {
           </DropdownMenuContent>
         </DropdownMenu>
 
-        <UserButton />
+        {user ? (
+          <div className='flex flex-col'>
+            <h1 className='font-medium text-md'>{`${user?.firstName} ${user?.lastName}`}</h1>
+            <p className='text-xs text-right'>{user?.publicMetadata.role}</p>
+          </div>
+        ) : (
+          <div className='flex flex-col gap-2'>
+            <Skeleton className='h-4 w-15 rounded-md' />
+            <Skeleton className='h-3 w-12 rounded-md ml-3' />
+          </div>
+        )}
+
+        {user ? (
+          <UserButton />
+        ) : (
+          <Skeleton className='h-10 w-10 rounded-full' />
+        )}
 
         {/* <DropdownMenu>
           <DropdownMenuTrigger>
