@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 
-const { sessionClaims } = await auth()
+const { sessionClaims, userId } = await auth()
 const role = sessionClaims.metadata?.role
 
 const columns = [
@@ -30,7 +30,7 @@ const columns = [
     header: 'Due Date',
     accessor: 'date',
   },
-  ...(role === 'admin'
+  ...(role === 'admin' || role === 'teacher'
     ? [
         {
           header: 'Actions',
@@ -52,12 +52,13 @@ const renderRow = (item) => {
         {new Date(item.dueDate).toLocaleDateString('en-IN')}
       </TableCell>
       <TableCell className='table-cell'>
-        {role === 'admin' && (
-          <div className='flex gap-2'>
-            <FormModel type='update' data={item} table='assignments' />
-            <FormModel type='delete' id={item.id} table='assignments' />
-          </div>
-        )}
+        {role === 'admin' ||
+          (role === 'teacher' && (
+            <div className='flex gap-2'>
+              <FormModel type='update' data={item} table='assignments' />
+              <FormModel type='delete' id={item.id} table='assignments' />
+            </div>
+          ))}
       </TableCell>
     </TableRow>
   )
@@ -68,6 +69,7 @@ const AssignmentListPage = async ({ searchParams }) => {
   const p = page ? parseInt(page) : 1
 
   const query = {}
+  query.lesson = {}
 
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {
@@ -89,6 +91,28 @@ const AssignmentListPage = async ({ searchParams }) => {
         }
       }
     }
+  }
+
+  switch (role) {
+    case 'teacher':
+      query.lesson.teacherId = userId
+      break
+    case 'student':
+      query.lesson.class = {
+        students: {
+          some: { id: userId },
+        },
+      }
+      break
+    case 'parent':
+      query.lesson.class = {
+        students: {
+          parentId: userId,
+        },
+      }
+      break
+    default:
+      break
   }
 
   const [data, count] = await prisma.$transaction([
@@ -127,9 +151,10 @@ const AssignmentListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            {role === 'admin' && (
-              <FormModel type='create' table='assignments' />
-            )}
+            {role === 'admin' ||
+              (role === 'teacher' && (
+                <FormModel type='create' table='assignments' />
+              ))}
           </div>
         </div>
       </div>
