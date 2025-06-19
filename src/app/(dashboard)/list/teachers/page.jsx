@@ -4,12 +4,16 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role } from '@/lib/data'
+
 import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, Book, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { auth } from '@clerk/nextjs/server'
+
+const { sessionClaims } = await auth()
+const role = sessionClaims.metadata?.role
 
 const columns = [
   {
@@ -41,10 +45,14 @@ const columns = [
     accessor: 'address',
     className: 'hidden lg:table-cell',
   },
-  {
-    header: 'Actions',
-    accessor: 'action',
-  },
+  ...(role === 'admin'
+    ? [
+        {
+          header: 'Actions',
+          accessor: 'action',
+        },
+      ]
+    : []),
 ]
 
 const renderRow = (item) => {

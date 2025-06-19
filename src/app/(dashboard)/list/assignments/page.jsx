@@ -4,10 +4,13 @@ import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
 import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
-import { role } from '@/lib/data'
 import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
+import { auth } from '@clerk/nextjs/server'
+
+const { sessionClaims } = await auth()
+const role = sessionClaims.metadata?.role
 
 const columns = [
   {
@@ -27,11 +30,14 @@ const columns = [
     header: 'Due Date',
     accessor: 'date',
   },
-  {
-    header: 'Actions',
-    accessor: 'action',
-    className: 'text-right',
-  },
+  ...(role === 'admin'
+    ? [
+        {
+          header: 'Actions',
+          accessor: 'action',
+        },
+      ]
+    : []),
 ]
 
 const renderRow = (item) => {
