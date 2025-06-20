@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 
-const { sessionClaims } = await auth()
+const { sessionClaims, userId } = await auth()
 const role = sessionClaims.metadata?.role
 
 const columns = [
@@ -99,6 +99,13 @@ const EventListPage = async ({ searchParams }) => {
       }
     }
   }
+
+  const roleConditions = {
+    teacher: { lessons: { some: { teacherId: userId } } },
+    student: { students: { some: { id: userId } } },
+    parent: { students: { some: { parentId: userId } } },
+  }
+  query.OR = [{ classId: null }, { class: roleConditions[role] || {} }]
 
   const [data, count] = await prisma.$transaction([
     prisma.event.findMany({

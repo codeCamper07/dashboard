@@ -52,13 +52,12 @@ const renderRow = (item) => {
         {new Date(item.dueDate).toLocaleDateString('en-IN')}
       </TableCell>
       <TableCell className='table-cell'>
-        {role === 'admin' ||
-          (role === 'teacher' && (
-            <div className='flex gap-2'>
-              <FormModel type='update' data={item} table='assignments' />
-              <FormModel type='delete' id={item.id} table='assignments' />
-            </div>
-          ))}
+        {(role === 'admin' || role === 'teacher') && (
+          <div className='flex gap-2'>
+            <FormModel type='update' data={item} table='assignments' />
+            <FormModel type='delete' id={item.id} table='assignments' />
+          </div>
+        )}
       </TableCell>
     </TableRow>
   )
@@ -94,6 +93,8 @@ const AssignmentListPage = async ({ searchParams }) => {
   }
 
   switch (role) {
+    case 'admin':
+      break
     case 'teacher':
       query.lesson.teacherId = userId
       break
@@ -107,7 +108,7 @@ const AssignmentListPage = async ({ searchParams }) => {
     case 'parent':
       query.lesson.class = {
         students: {
-          parentId: userId,
+          some: { parentId: userId },
         },
       }
       break
@@ -151,10 +152,9 @@ const AssignmentListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            {role === 'admin' ||
-              (role === 'teacher' && (
-                <FormModel type='create' table='assignments' />
-              ))}
+            {(role === 'admin' || role === 'teacher') && (
+              <FormModel type='create' table='assignments' />
+            )}
           </div>
         </div>
       </div>

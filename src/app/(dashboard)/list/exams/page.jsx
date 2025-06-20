@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 
-const { sessionClaims } = await auth()
+const { sessionClaims, userId } = await auth()
 const role = sessionClaims.metadata?.role
 
 const columns = [
@@ -67,6 +67,7 @@ const ExamListPage = async ({ searchParams }) => {
   const p = page ? parseInt(page) : 1
 
   const query = {}
+  query.lesson = {}
 
   if (queryParams) {
     for (const [key, value] of Object.entries(queryParams)) {
@@ -82,6 +83,29 @@ const ExamListPage = async ({ searchParams }) => {
         }
       }
     }
+  }
+  switch (role) {
+    case 'admin':
+      break
+    case 'teacher':
+      query.lesson.teacherId = userId
+      break
+    case 'student':
+      query.lesson.class = {
+        students: {
+          some: { id: userId },
+        },
+      }
+      break
+    case 'parent':
+      query.lesson.class = {
+        students: {
+          some: { parentId: userId },
+        },
+      }
+      break
+    default:
+      break
   }
 
   const [data, count] = await prisma.$transaction([
