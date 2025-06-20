@@ -30,7 +30,7 @@ const columns = [
     header: 'Exam Date',
     accessor: 'date',
   },
-  ...(role === 'admin'
+  ...(role === 'admin' || role === 'teacher'
     ? [
         {
           header: 'Actions',
@@ -51,7 +51,7 @@ const renderRow = (item) => {
         {new Date(item.startTime).toLocaleDateString('en-IN')}
       </TableCell>
       <TableCell className='table-cell'>
-        {role === 'admin' && (
+        {(role === 'admin' || role === 'teacher') && (
           <div className='flex gap-2'>
             <FormModel type='update' data={item} table='exams' />
             <FormModel type='delete' id={item.id} table='exams' />
@@ -74,11 +74,17 @@ const ExamListPage = async ({ searchParams }) => {
       if (value !== undefined) {
         switch (key) {
           case 'search':
-            query.lesson = {
-              subject: {
-                name: { contains: value, mode: 'insensitive' },
-              },
+            query.lesson.subject = {
+              name: { contains: value, mode: 'insensitive' },
             }
+            break
+          case 'classId':
+            query.lesson.classId = parseInt(value)
+            break
+          case 'teacherId':
+            query.lesson.teacherId = value
+            break
+          default:
             break
         }
       }
@@ -142,7 +148,9 @@ const ExamListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            {role === 'admin' && <FormModel type='create' table='exams' />}
+            {(role === 'admin' || role === 'teacher') && (
+              <FormModel type='create' table='exams' />
+            )}
           </div>
         </div>
       </div>

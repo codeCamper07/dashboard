@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 
-const { sessionClaims } = await auth()
+const { sessionClaims, userId } = await auth()
 const role = sessionClaims.metadata?.role
 
 const columns = [
@@ -41,7 +41,7 @@ const columns = [
     accessor: 'date',
     className: 'hidden md:table-cell',
   },
-  ...(role === 'admin'
+  ...(role === 'admin' || role === 'teacher'
     ? [
         {
           header: 'Actions',
@@ -64,7 +64,7 @@ const renderRow = (item) => {
         {new Date(item.date).toLocaleDateString('en-IN')}
       </TableCell>
       <TableCell className='table-cell'>
-        {role === 'admin' && (
+        {(role === 'admin' || role === 'teacher') && (
           <div className='flex gap-2'>
             <FormModel type='update' data={item} table='results' />
             <FormModel type='delete' id={item.id} table='results' />
@@ -99,6 +99,27 @@ const ResultListPage = async ({ searchParams }) => {
         }
       }
     }
+  }
+
+  switch (role) {
+    case 'admin':
+      break
+    case 'teacher':
+      query.OR = [
+        { exam: { lesson: { teacherId: userId } } },
+        { assignment: { lesson: { teacherId: userId } } },
+      ]
+      break
+    case 'student':
+      query.studentId = userId
+      break
+    case 'parent':
+      query.student = {
+        parentId: userId,
+      }
+      break
+    default:
+      break
   }
 
   const [dataRes, count] = await prisma.$transaction([
@@ -166,7 +187,9 @@ const ResultListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            {role === 'admin' && <FormModel type='create' table='results' />}
+            {(role === 'admin' || role === 'teacher') && (
+              <FormModel type='create' table='results' />
+            )}
           </div>
         </div>
       </div>

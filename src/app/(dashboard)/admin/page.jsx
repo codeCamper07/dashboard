@@ -1,8 +1,9 @@
 import Announcement from '@/components/Announcement'
 import { AreaChartComponent } from '@/components/AreaChart'
 import { BarChartComponent } from '@/components/BarChart'
+import BarChartContainer from '@/components/BarChartContainer'
 import { AppCalendar } from '@/components/Calendar'
-import { RadialChart } from '@/components/RadialChart'
+import RadialChartContainer from '@/components/RadialChartContainer'
 import UserCards from '@/components/UserCards'
 
 const Admin = () => {
@@ -13,18 +14,18 @@ const Admin = () => {
         <div className='w-full lg:w-2/3 md:w-1/2 flex flex-col gap-8'>
           <div className='flex justify-between gap-4 flex-wrap'>
             {/* User cards */}
-            <UserCards type='Student' />
-            <UserCards type='Teacher' />
-            <UserCards type='Parent' />
-            <UserCards type='Staff' />
+            <UserCards type='admin' />
+            <UserCards type='student' />
+            <UserCards type='teacher' />
+            <UserCards type='parent' />
           </div>
           {/* dual charts */}
           <div className='flex flex-col lg:flex-row gap-4'>
             <div className='w-full lg:w-1/3 h-[450px] '>
-              <RadialChart />
+              <RadialChartContainer />
             </div>
             <div className='w-full lg:w-2/3 h-[450px]'>
-              <BarChartComponent />
+              <BarChartContainer />
             </div>
           </div>
           <div>
