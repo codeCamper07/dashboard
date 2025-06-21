@@ -1,12 +1,12 @@
 import Announcement from '@/components/Announcement'
 import { AreaChartComponent } from '@/components/AreaChart'
-import { BarChartComponent } from '@/components/BarChart'
 import BarChartContainer from '@/components/BarChartContainer'
 import { AppCalendar } from '@/components/Calendar'
+import EventCalenderContainer from '@/components/EventCalenderContainer'
 import RadialChartContainer from '@/components/RadialChartContainer'
 import UserCards from '@/components/UserCards'
 
-const Admin = () => {
+const Admin = ({ searchParams }) => {
   return (
     <div>
       <div className='flex flex-col gap-4 p-5 md:flex-row'>
@@ -38,7 +38,7 @@ const Admin = () => {
             <h1 className='text-foreground font-xl font-bold mb-2'>
               Events Calender
             </h1>
-            <AppCalendar />
+            <EventCalenderContainer searchParams={searchParams} />
           </div>
           <div className='bg-card mb-4 p-4 rounded-xl'>
             <Announcement />
