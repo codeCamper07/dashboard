@@ -1,27 +1,26 @@
-import React from 'react'
+import { prisma } from '@/lib/prisma'
+import { auth } from '@clerk/nextjs/server'
 
-const events = [
-  {
-    id: 1,
-    title: 'Lorem ipsum dolor',
-    time: '12:00 PM - 2:00 PM',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.',
-  },
-  {
-    id: 2,
-    title: 'Lorem ipsum dolor',
-    time: '12:00 PM - 2:00 PM',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.',
-  },
-  {
-    id: 3,
-    title: 'Lorem ipsum dolor',
-    time: '12:00 PM - 2:00 PM',
-    description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit.',
-  },
-]
+const Announcement = async () => {
+  const { userId, sessionClaims } = await auth()
+  const role = sessionClaims?.metadata.role
 
-const Announcement = () => {
+  const roleConditions = {
+    teacher: { lessons: { some: { teacherId: userId } } },
+    student: { students: { some: { id: userId } } },
+    parent: { students: { some: { parentId: userId } } },
+  }
+
+  const events = await prisma.Announcement.findMany({
+    take: 3,
+    orderBy: { date: 'desc' },
+    where: {
+      ...(role !== 'admin' && {
+        OR: [{ classId: null }, { class: roleConditions[role] || {} }],
+      }),
+    },
+  })
+
   return (
     <div className='flex flex-col gap-4 bg-card p-4 rounded-md'>
       <div className='flex items-center justify-between'>
@@ -36,7 +35,9 @@ const Announcement = () => {
               key={items.id}>
               <div className='flex justify-between items-center'>
                 <h1 className='font-semibold text-primary'>{items.title}</h1>
-                <span className='text-xs'>{items.time}</span>
+                <span className='text-xs'>
+                  {new Date(items.date).toLocaleDateString('en-IN')}
+                </span>
               </div>
               <p className='text-sm'>{items.description}</p>
             </div>

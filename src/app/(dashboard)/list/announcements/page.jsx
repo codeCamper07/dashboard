@@ -39,7 +39,7 @@ const renderRow = (item) => {
   return (
     <TableRow key={item.id}>
       <TableCell>{item.title}</TableCell>
-      <TableCell>{item.class.name}</TableCell>
+      <TableCell>{item.class?.name}</TableCell>
       <TableCell className='hidden md:table-cell'>
         {new Date(item.date).toLocaleDateString('en-IN')}
       </TableCell>

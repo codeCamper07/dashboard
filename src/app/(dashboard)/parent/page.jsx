@@ -1,14 +1,26 @@
 import Announcement from '@/components/Announcement'
-import BigCalendar from '@/components/BigCalendar'
 
-const Parentpage = () => {
+import BigCalenderContainer from '@/components/BigCalenderContainer'
+import { auth } from '@clerk/nextjs/server'
+
+const Parentpage = async () => {
+  const { userId } = await auth()
+  const classItem = await prisma.class.findMany({
+    where: {
+      students: {
+        some: {
+          parentId: userId,
+        },
+      },
+    },
+  })
   return (
     <div className='flex-1 flex flex-col gap-4 p-4 xl:flex-row'>
       {/* LEFT */}
       <div className='w-full xl:w-2/3 '>
         <div className='h-full bg-card p-5 rounded-xl'>
           <h1 className='text-xl font-semibold'>Schedule (John Doe)</h1>
-          <BigCalendar />
+          <BigCalenderContainer type='parentId' id={classItem[0].id} />
         </div>
       </div>
       {/* Right */}

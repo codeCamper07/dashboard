@@ -1,7 +1,6 @@
 import Announcement from '@/components/Announcement'
 import { AreaChartComponent } from '@/components/AreaChart'
 import BarChartContainer from '@/components/BarChartContainer'
-import { AppCalendar } from '@/components/Calendar'
 import EventCalenderContainer from '@/components/EventCalenderContainer'
 import RadialChartContainer from '@/components/RadialChartContainer'
 import UserCards from '@/components/UserCards'
