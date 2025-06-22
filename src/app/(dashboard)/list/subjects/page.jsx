@@ -46,8 +46,8 @@ const renderRow = (item) => {
       <TableCell className='table-cell'>
         {role === 'admin' && (
           <div className='flex gap-2'>
-            <FormModel type='update' table='subjects' data={item} />
-            <FormModel type='delete' table='subjects' id={item.id} />
+            <FormModel type='update' table='subject' data={item} />
+            <FormModel type='delete' table='subject' id={item.id} />
           </div>
         )}
       </TableCell>
@@ -109,7 +109,7 @@ const SubjectListPage = async ({ searchParams }) => {
               //   <Plus />
               // </Button>
               <>
-                <FormModel type='create' table='subjects' />
+                <FormModel type='create' table='subject' />
               </>
             )}
           </div>

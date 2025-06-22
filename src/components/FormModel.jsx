@@ -5,13 +5,14 @@ import { Button } from './ui/button'
 import { Plus, SquarePenIcon, Trash } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-// import TeacherForm from './forms/TeacherForm'
-// import StudentForm from './forms/StudentForm'
 
 const TeacherForm = dynamic(() => import('./forms/TeacherForm'), {
   loading: () => <h1>Loading...!</h1>,
 })
 const StudentForm = dynamic(() => import('./forms/StudentForm'), {
+  loading: () => <h1>Loading...!</h1>,
+})
+const SubjectForm = dynamic(() => import('./forms/SubjectForm'), {
   loading: () => <h1>Loading...!</h1>,
 })
 
@@ -20,8 +21,15 @@ const FormModel = ({ table, type, data, id }) => {
   const size = type === 'create' ? 'w-8 h-8' : 'w-7 h-7'
 
   const forms = {
-    teacher: (type, data) => <TeacherForm type={type} data={data} />,
-    student: (type, data) => <StudentForm type={type} data={data} />,
+    teacher: (type, data, setOpen) => (
+      <TeacherForm type={type} data={data} setOpen={setOpen} />
+    ),
+    student: (type, data, setOpen) => (
+      <StudentForm type={type} data={data} setOpen={setOpen} />
+    ),
+    subject: (type, data, setOpen) => (
+      <SubjectForm type={type} data={data} setOpen={setOpen} />
+    ),
   }
 
   const Form = () => {
@@ -33,7 +41,7 @@ const FormModel = ({ table, type, data, id }) => {
         <Button className='bg-destructive'>Delete</Button>
       </form>
     ) : forms[table] ? (
-      forms[table](type, data)
+      forms[table](type, data, setOpen)
     ) : (
       <div>Form not found</div>
     )
