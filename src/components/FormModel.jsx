@@ -1,10 +1,13 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useActionState, useEffect, useState } from 'react'
 import { Button } from './ui/button'
 import { Plus, SquarePenIcon, Trash } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import { deleteSubject } from '@/lib/action'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 const TeacherForm = dynamic(() => import('./forms/TeacherForm'), {
   loading: () => <h1>Loading...!</h1>,
@@ -16,32 +19,73 @@ const SubjectForm = dynamic(() => import('./forms/SubjectForm'), {
   loading: () => <h1>Loading...!</h1>,
 })
 
-const FormModel = ({ table, type, data, id }) => {
+const deleteActionMap = {
+  subject: deleteSubject,
+  student: deleteSubject,
+  parent: deleteSubject,
+  assignment: deleteSubject,
+  class: deleteSubject,
+  exam: deleteSubject,
+  announcement: deleteSubject,
+  result: deleteSubject,
+}
+
+const FormModel = ({ table, type, data, id, relatedData }) => {
   const [open, setOpen] = useState(false)
   const size = type === 'create' ? 'w-8 h-8' : 'w-7 h-7'
 
   const forms = {
-    teacher: (type, data, setOpen) => (
-      <TeacherForm type={type} data={data} setOpen={setOpen} />
+    teacher: (type, data, setOpen, relatedData) => (
+      <TeacherForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
     ),
-    student: (type, data, setOpen) => (
-      <StudentForm type={type} data={data} setOpen={setOpen} />
+    student: (type, data, setOpen, relatedData) => (
+      <StudentForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
     ),
-    subject: (type, data, setOpen) => (
-      <SubjectForm type={type} data={data} setOpen={setOpen} />
+    subject: (type, data, setOpen, relatedData) => (
+      <SubjectForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
     ),
   }
 
   const Form = () => {
+    const [state, formAction] = useActionState(deleteActionMap[table], {
+      success: false,
+      error: false,
+    })
+    const router = useRouter()
+
+    useEffect(() => {
+      if (state.success) {
+        toast.success(`Data from ${table} deleted successfully!`)
+        router.refresh()
+        setOpen(false)
+      }
+    }, [state, router])
+
     return type === 'delete' && id ? (
-      <form className='flex flex-col items-center gap-4'>
+      <form action={formAction} className='flex flex-col items-center gap-4'>
+        <input hidden defaultValue={id} name='id' type='text | number' />
         <span className='font-sm font-semibold text-center'>
           All Data will be lost. Are you sure you want to Delete?
         </span>
         <Button className='bg-destructive'>Delete</Button>
       </form>
     ) : forms[table] ? (
-      forms[table](type, data, setOpen)
+      forms[table](type, data, setOpen, relatedData)
     ) : (
       <div>Form not found</div>
     )

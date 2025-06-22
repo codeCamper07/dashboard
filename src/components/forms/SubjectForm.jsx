@@ -5,16 +5,18 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '../ui/button'
 import InputFeilds from '../InputFeilds'
-import { createSubject } from '@/lib/action'
+import { createSubject, updateSubject } from '@/lib/action'
 import { startTransition, useActionState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 
 const schema = z.object({
+  id: z.coerce.number().optional(),
   name: z.string().min(1, { message: 'Subject Name is required!' }),
+  teachers: z.array(z.string()),
 })
 
-const SubjectForm = ({ type, data, setOpen }) => {
+const SubjectForm = ({ type, data, setOpen, relatedData }) => {
   const {
     register,
     handleSubmit,
@@ -24,10 +26,13 @@ const SubjectForm = ({ type, data, setOpen }) => {
   })
   const router = useRouter()
 
-  const [state, formAction] = useActionState(createSubject, {
-    success: false,
-    error: false,
-  })
+  const [state, formAction] = useActionState(
+    type === 'create' ? createSubject : updateSubject,
+    {
+      success: false,
+      error: false,
+    },
+  )
   const onSubmit = handleSubmit((formData) => {
     startTransition(() => formAction(formData))
   })
@@ -44,6 +49,8 @@ const SubjectForm = ({ type, data, setOpen }) => {
     }
   }, [state])
 
+  const { teachers } = relatedData
+
   return (
     <form className='flex flex-col gap-8' onSubmit={onSubmit}>
       <h1 className='font-xl font-semibold'>
@@ -58,6 +65,35 @@ const SubjectForm = ({ type, data, setOpen }) => {
           defaultValue={data?.name}
           errors={errors?.name}
         />
+        {data && (
+          <InputFeilds
+            label='id'
+            name='id'
+            register={register}
+            defaultValue={data?.id}
+            errors={errors?.id}
+            disabled={true}
+          />
+        )}
+        <div className='flex flex-col gap-2 w-full md:w-1/4'>
+          <label className='text-xs'>Teacher</label>
+          <select
+            multiple={true}
+            className='ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full'
+            {...register('teachers')}
+            defaultValue={data?.teachers}>
+            {teachers.map((teacher) => (
+              <option value={teacher.id} key={teacher.id}>
+                {teacher.name + ' ' + teacher.surname}
+              </option>
+            ))}
+          </select>
+          {errors?.teachers && (
+            <p className='text-red-500 text-xs'>
+              {errors?.teachers.toString()}
+            </p>
+          )}
+        </div>
       </div>
       {state.error && (
         <span className='text-sm text-destructive'>Something went wrong!</span>

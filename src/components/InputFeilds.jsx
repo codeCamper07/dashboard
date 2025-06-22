@@ -1,4 +1,5 @@
 import React from 'react'
+import { Input } from './ui/input'
 
 const InputFeilds = ({
   label,
@@ -7,15 +8,17 @@ const InputFeilds = ({
   register,
   errors,
   defaultValue,
+  disabled,
 }) => {
+  const registerProps = register ? register(name) : {}
   return (
     <div className='flex flex-col gap-2 w-full md:w-1/4'>
       <label className='text-xs'>{label}</label>
-      <input
+      <Input
+        disabled={disabled}
         type={type}
         defaultValue={defaultValue}
-        className='ring-1 ring-primary rounded-lg p-2 w-full'
-        {...register(name)}
+        {...registerProps}
       />
       {errors?.message && (
         <p className='text-red-500 text-xs'>{errors?.message.toString()}</p>
