@@ -11,6 +11,7 @@ import { ArrowDownWideNarrow, Book, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
+import FormContainer from '@/components/FormContainer'
 
 const { sessionClaims } = await auth()
 const role = sessionClaims.metadata?.role
@@ -82,17 +83,14 @@ const renderRow = (item) => {
       <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
       <TableCell className='table-cell'>
         {role === 'admin' && (
-          // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-          //   <Trash2 />
-          // </Button>
           <div className='flex gap-2'>
             <Link href={`/list/teachers/${item.id}`}>
               <Button className='flex items-center justify-center rounded-full w-7 h-7'>
                 <Book />
               </Button>
             </Link>
-            <FormModel type='update' table='teacher' data={item} />
-            <FormModel type='delete' table='teacher' id={item.id} />
+            <FormContainer type='update' table='teacher' data={item} />
+            <FormContainer type='delete' table='teacher' id={item.id} />
           </div>
         )}
       </TableCell>
@@ -159,10 +157,7 @@ const TeachersListPage = async ({ searchParams }) => {
               <ArrowDownWideNarrow />
             </Button>
             {role === 'admin' && (
-              // <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              //   <Plus />
-              // </Button>
-              <FormModel type='create' table='teacher' />
+              <FormContainer type='create' table='teacher' />
             )}
           </div>
         </div>

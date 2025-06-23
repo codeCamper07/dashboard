@@ -8,6 +8,7 @@ import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
+import FormContainer from '@/components/FormContainer'
 
 const { sessionClaims } = await auth()
 const role = sessionClaims.metadata?.role
@@ -51,8 +52,8 @@ const renderRow = (item) => {
       <TableCell className='table-cell'>
         {role === 'admin' && (
           <div className='flex gap-2'>
-            <FormModel type='update' table='classes' data={item} />
-            <FormModel type='delete' table='classes' id={item.id} />
+            <FormContainer type='update' table='class' data={item} />
+            <FormContainer type='delete' table='class' id={item.id} />
           </div>
         )}
       </TableCell>
@@ -115,7 +116,7 @@ const ClassesListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            {role === 'admin' && <FormModel type='create' table='classes' />}
+            {role === 'admin' && <FormContainer type='create' table='class' />}
           </div>
         </div>
       </div>
