@@ -74,7 +74,7 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
       setOpen(false)
       router.refresh()
     }
-  }, [state])
+  }, [state, router, type, setOpen])
 
   const { classes, grades } = relatedData
 

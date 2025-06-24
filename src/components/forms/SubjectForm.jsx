@@ -47,7 +47,7 @@ const SubjectForm = ({ type, data, setOpen, relatedData }) => {
       setOpen(false)
       router.refresh()
     }
-  }, [state])
+  }, [state, router, type, setOpen])
 
   const { teachers } = relatedData
 
