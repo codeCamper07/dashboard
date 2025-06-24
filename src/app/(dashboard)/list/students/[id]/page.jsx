@@ -16,7 +16,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 const SingleStudentPage = async ({ params }) => {
-  const id = await params.id
+  const { id } = await params
   const student = await prisma.student.findUnique({
     where: {
       id,

@@ -17,7 +17,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 const SingleTeacherPage = async ({ params }) => {
-  const id = await params.id
+  const { id } = await params
   const teacher = await prisma.teacher.findUnique({
     where: {
       id,
