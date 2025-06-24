@@ -9,66 +9,11 @@ import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 
-const { sessionClaims } = await auth()
-const role = sessionClaims.metadata?.role
-
-const columns = [
-  {
-    header: 'Info',
-    accessor: 'info',
-  },
-  {
-    header: 'Student Names',
-    accessor: 'student names',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Phone',
-    accessor: 'phone',
-    className: 'hidden lg:table-cell',
-  },
-  {
-    header: 'Address',
-    accessor: 'address',
-    className: 'hidden lg:table-cell',
-  },
-  ...(role === 'admin'
-    ? [
-        {
-          header: 'Actions',
-          accessor: 'action',
-        },
-      ]
-    : []),
-]
-const renderRow = (item) => {
-  return (
-    <TableRow key={item.id}>
-      <TableCell className='flex items-center gap-2'>
-        <div className='flex flex-col gap-1'>
-          <h3 className='font-bold text-md'>{item.name}</h3>
-          <p className='font-extralight text-sm'>{item?.email}</p>
-        </div>
-      </TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {item.students.map((student) => student.name).join(',')}
-      </TableCell>
-      <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
-      <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
-      <TableCell className='table-cell'>
-        {role === 'admin' && (
-          <div className='flex gap-2'>
-            <FormModel type='update' table='parents' data={item} />
-            <FormModel type='delete' table='parents' id={item.id} />
-          </div>
-        )}
-      </TableCell>
-    </TableRow>
-  )
-}
 const ParentListPage = async ({ searchParams }) => {
   const { page, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
+  const { sessionClaims } = await auth()
+  const role = sessionClaims.metadata?.role
 
   const query = {}
 
@@ -102,6 +47,61 @@ const ParentListPage = async ({ searchParams }) => {
       where: query,
     }),
   ])
+
+  const columns = [
+    {
+      header: 'Info',
+      accessor: 'info',
+    },
+    {
+      header: 'Student Names',
+      accessor: 'student names',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Phone',
+      accessor: 'phone',
+      className: 'hidden lg:table-cell',
+    },
+    {
+      header: 'Address',
+      accessor: 'address',
+      className: 'hidden lg:table-cell',
+    },
+    ...(role === 'admin'
+      ? [
+          {
+            header: 'Actions',
+            accessor: 'action',
+          },
+        ]
+      : []),
+  ]
+  const renderRow = (item) => {
+    return (
+      <TableRow key={item.id}>
+        <TableCell className='flex items-center gap-2'>
+          <div className='flex flex-col gap-1'>
+            <h3 className='font-bold text-md'>{item.name}</h3>
+            <p className='font-extralight text-sm'>{item?.email}</p>
+          </div>
+        </TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {item.students.map((student) => student.name).join(',')}
+        </TableCell>
+        <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
+        <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
+        <TableCell className='table-cell'>
+          {role === 'admin' && (
+            <div className='flex gap-2'>
+              <FormModel type='update' table='parents' data={item} />
+              <FormModel type='delete' table='parents' id={item.id} />
+            </div>
+          )}
+        </TableCell>
+      </TableRow>
+    )
+  }
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>

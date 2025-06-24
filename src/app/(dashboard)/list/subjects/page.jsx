@@ -9,55 +9,11 @@ import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 import FormContainer from '@/components/FormContainer'
 
-const { sessionClaims } = await auth()
-const role = sessionClaims.metadata?.role
-
-const columns = [
-  {
-    header: 'No',
-    accessor: 'no',
-  },
-  {
-    header: 'Subject',
-    accessor: 'subject',
-  },
-  {
-    header: 'Teachers Names',
-    accessor: 'Teachers names',
-    className: 'hidden md:table-cell',
-  },
-  ...(role === 'admin'
-    ? [
-        {
-          header: 'Actions',
-          accessor: 'action',
-        },
-      ]
-    : []),
-]
-const renderRow = (item) => {
-  return (
-    <TableRow key={item.id}>
-      <TableCell>{item.id}</TableCell>
-      <TableCell>{item.name}</TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {item.teachers.map((teacher) => teacher.name).join(',')}
-      </TableCell>
-      <TableCell className='table-cell'>
-        {role === 'admin' && (
-          <div className='flex gap-2'>
-            <FormContainer type='update' table='subject' data={item} />
-            <FormContainer type='delete' table='subject' id={item.id} />
-          </div>
-        )}
-      </TableCell>
-    </TableRow>
-  )
-}
-
 const SubjectListPage = async ({ searchParams }) => {
   const { page, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
+  const { sessionClaims } = await auth()
+  const role = sessionClaims.metadata?.role
 
   const query = {}
 
@@ -89,6 +45,49 @@ const SubjectListPage = async ({ searchParams }) => {
       where: query,
     }),
   ])
+
+  const columns = [
+    {
+      header: 'No',
+      accessor: 'no',
+    },
+    {
+      header: 'Subject',
+      accessor: 'subject',
+    },
+    {
+      header: 'Teachers Names',
+      accessor: 'Teachers names',
+      className: 'hidden md:table-cell',
+    },
+    ...(role === 'admin'
+      ? [
+          {
+            header: 'Actions',
+            accessor: 'action',
+          },
+        ]
+      : []),
+  ]
+  const renderRow = (item) => {
+    return (
+      <TableRow key={item.id}>
+        <TableCell>{item.id}</TableCell>
+        <TableCell>{item.name}</TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {item.teachers.map((teacher) => teacher.name).join(',')}
+        </TableCell>
+        <TableCell className='table-cell'>
+          {role === 'admin' && (
+            <div className='flex gap-2'>
+              <FormContainer type='update' table='subject' data={item} />
+              <FormContainer type='delete' table='subject' id={item.id} />
+            </div>
+          )}
+        </TableCell>
+      </TableRow>
+    )
+  }
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>

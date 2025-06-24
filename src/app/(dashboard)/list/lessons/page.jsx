@@ -9,56 +9,11 @@ import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 
-const { sessionClaims } = await auth()
-const role = sessionClaims.metadata?.role
-
-const columns = [
-  {
-    header: 'Subject Name',
-    accessor: 'subject',
-  },
-  {
-    header: 'Class',
-    accessor: 'class',
-  },
-  {
-    header: 'Teacher',
-    accessor: 'teacher',
-    className: 'hidden md:table-cell',
-  },
-  ...(role === 'admin'
-    ? [
-        {
-          header: 'Actions',
-          accessor: 'action',
-        },
-      ]
-    : []),
-]
-
-const renderRow = (item) => {
-  return (
-    <TableRow key={item.id}>
-      <TableCell>{item.subject.name}</TableCell>
-      <TableCell>{item.class.name}</TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {item.teacher.name + ' ' + item.teacher.surname}
-      </TableCell>
-      <TableCell className='table-cell'>
-        {role === 'admin' && (
-          <div className='flex gap-2'>
-            <FormModel type='update' data={item} table='lessons' />
-            <FormModel type='delete' id={item.id} table='lessons' />
-          </div>
-        )}
-      </TableCell>
-    </TableRow>
-  )
-}
-
 const LessonsListPage = async ({ searchParams }) => {
   const { page, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
+  const { sessionClaims } = await auth()
+  const role = sessionClaims.metadata?.role
 
   const query = {}
 
@@ -98,6 +53,49 @@ const LessonsListPage = async ({ searchParams }) => {
       where: query,
     }),
   ])
+  const columns = [
+    {
+      header: 'Subject Name',
+      accessor: 'subject',
+    },
+    {
+      header: 'Class',
+      accessor: 'class',
+    },
+    {
+      header: 'Teacher',
+      accessor: 'teacher',
+      className: 'hidden md:table-cell',
+    },
+    ...(role === 'admin'
+      ? [
+          {
+            header: 'Actions',
+            accessor: 'action',
+          },
+        ]
+      : []),
+  ]
+
+  const renderRow = (item) => {
+    return (
+      <TableRow key={item.id}>
+        <TableCell>{item.subject.name}</TableCell>
+        <TableCell>{item.class.name}</TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {item.teacher.name + ' ' + item.teacher.surname}
+        </TableCell>
+        <TableCell className='table-cell'>
+          {role === 'admin' && (
+            <div className='flex gap-2'>
+              <FormModel type='update' data={item} table='lessons' />
+              <FormModel type='delete' id={item.id} table='lessons' />
+            </div>
+          )}
+        </TableCell>
+      </TableRow>
+    )
+  }
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>

@@ -9,75 +9,11 @@ import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 
-const { sessionClaims, userId } = await auth()
-const role = sessionClaims.metadata?.role
-
-const columns = [
-  {
-    header: 'Subject Name',
-    accessor: 'name',
-  },
-  {
-    header: 'Student',
-    accessor: 'student',
-  },
-  {
-    header: 'Score',
-    accessor: 'score',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Teacher',
-    accessor: 'teacher',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Class',
-    accessor: 'class',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Date',
-    accessor: 'date',
-    className: 'hidden md:table-cell',
-  },
-  ...(role === 'admin' || role === 'teacher'
-    ? [
-        {
-          header: 'Actions',
-          accessor: 'action',
-        },
-      ]
-    : []),
-]
-const renderRow = (item) => {
-  return (
-    <TableRow key={item.id}>
-      <TableCell>{item.title}</TableCell>
-      <TableCell>{item.studentName + ' ' + item.studentSurname}</TableCell>
-      <TableCell className='hidden md:table-cell'>{item.score}</TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {item.teacherName + ' ' + item.teacherSurname}
-      </TableCell>
-      <TableCell className='hidden md:table-cell'>{item.className}</TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {new Date(item.date).toLocaleDateString('en-IN')}
-      </TableCell>
-      <TableCell className='table-cell'>
-        {(role === 'admin' || role === 'teacher') && (
-          <div className='flex gap-2'>
-            <FormModel type='update' data={item} table='results' />
-            <FormModel type='delete' id={item.id} table='results' />
-          </div>
-        )}
-      </TableCell>
-    </TableRow>
-  )
-}
-
 const ResultListPage = async ({ searchParams }) => {
   const { page, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
+  const { sessionClaims, userId } = await auth()
+  const role = sessionClaims.metadata?.role
 
   const query = {}
 
@@ -172,6 +108,69 @@ const ResultListPage = async ({ searchParams }) => {
       date: isExam ? assessment.startTime : assessment.startDate,
     }
   })
+
+  const columns = [
+    {
+      header: 'Subject Name',
+      accessor: 'name',
+    },
+    {
+      header: 'Student',
+      accessor: 'student',
+    },
+    {
+      header: 'Score',
+      accessor: 'score',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Teacher',
+      accessor: 'teacher',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Class',
+      accessor: 'class',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Date',
+      accessor: 'date',
+      className: 'hidden md:table-cell',
+    },
+    ...(role === 'admin' || role === 'teacher'
+      ? [
+          {
+            header: 'Actions',
+            accessor: 'action',
+          },
+        ]
+      : []),
+  ]
+  const renderRow = (item) => {
+    return (
+      <TableRow key={item.id}>
+        <TableCell>{item.title}</TableCell>
+        <TableCell>{item.studentName + ' ' + item.studentSurname}</TableCell>
+        <TableCell className='hidden md:table-cell'>{item.score}</TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {item.teacherName + ' ' + item.teacherSurname}
+        </TableCell>
+        <TableCell className='hidden md:table-cell'>{item.className}</TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {new Date(item.date).toLocaleDateString('en-IN')}
+        </TableCell>
+        <TableCell className='table-cell'>
+          {(role === 'admin' || role === 'teacher') && (
+            <div className='flex gap-2'>
+              <FormModel type='update' data={item} table='results' />
+              <FormModel type='delete' id={item.id} table='results' />
+            </div>
+          )}
+        </TableCell>
+      </TableRow>
+    )
+  }
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>

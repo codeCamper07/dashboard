@@ -9,77 +9,12 @@ import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 
-const { sessionClaims, userId } = await auth()
-const role = sessionClaims.metadata?.role
-
-const columns = [
-  {
-    header: 'Title',
-    accessor: 'title',
-  },
-  {
-    header: 'Class',
-    accessor: 'class',
-  },
-  {
-    header: 'Date',
-    accessor: 'date',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Start Time',
-    accessor: 'startTime',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'End Time',
-    accessor: 'endTime',
-    className: 'hidden md:table-cell',
-  },
-  ...(role === 'admin'
-    ? [
-        {
-          header: 'Actions',
-          accessor: 'action',
-        },
-      ]
-    : []),
-]
-const renderRow = (item) => {
-  return (
-    <TableRow key={item.id}>
-      <TableCell>{item.title}</TableCell>
-      <TableCell>{item.class.name}</TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {new Date(item.startTime).toLocaleDateString('en-IN')}
-      </TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {new Date(item.startTime).toLocaleTimeString('en-IN', {
-          hour: '2-digit',
-          minute: '2-digit',
-        })}
-      </TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {new Date(item.endTime).toLocaleTimeString('en-IN', {
-          hour: '2-digit',
-          minute: '2-digit',
-        })}
-      </TableCell>
-      <TableCell className='table-cell'>
-        {role === 'admin' && (
-          <div className='flex gap-2'>
-            <FormModel type='update' data={item} table='events' />
-            <FormModel type='delete' id={item.id} table='events' />
-          </div>
-        )}
-      </TableCell>
-    </TableRow>
-  )
-}
-
 const EventListPage = async ({ searchParams }) => {
   const { page, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
+
+  const { sessionClaims, userId } = await auth()
+  const role = sessionClaims.metadata?.role
 
   const query = {}
 
@@ -121,6 +56,70 @@ const EventListPage = async ({ searchParams }) => {
       where: query,
     }),
   ])
+  const columns = [
+    {
+      header: 'Title',
+      accessor: 'title',
+    },
+    {
+      header: 'Class',
+      accessor: 'class',
+    },
+    {
+      header: 'Date',
+      accessor: 'date',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Start Time',
+      accessor: 'startTime',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'End Time',
+      accessor: 'endTime',
+      className: 'hidden md:table-cell',
+    },
+    ...(role === 'admin'
+      ? [
+          {
+            header: 'Actions',
+            accessor: 'action',
+          },
+        ]
+      : []),
+  ]
+  const renderRow = (item) => {
+    return (
+      <TableRow key={item.id}>
+        <TableCell>{item.title}</TableCell>
+        <TableCell>{item.class.name}</TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {new Date(item.startTime).toLocaleDateString('en-IN')}
+        </TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {new Date(item.startTime).toLocaleTimeString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {new Date(item.endTime).toLocaleTimeString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+          })}
+        </TableCell>
+        <TableCell className='table-cell'>
+          {role === 'admin' && (
+            <div className='flex gap-2'>
+              <FormModel type='update' data={item} table='events' />
+              <FormModel type='delete' id={item.id} table='events' />
+            </div>
+          )}
+        </TableCell>
+      </TableRow>
+    )
+  }
 
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>

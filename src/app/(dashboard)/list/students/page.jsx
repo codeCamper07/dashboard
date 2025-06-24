@@ -11,85 +11,11 @@ import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import FormContainer from '@/components/FormContainer'
 
-const { sessionClaims } = await auth()
-const role = sessionClaims.metadata?.role
-
-const columns = [
-  {
-    header: 'Info',
-    accessor: 'info',
-  },
-  {
-    header: 'Student ID',
-    accessor: 'studentId',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Grade',
-    accessor: 'grade',
-    className: 'hidden md:table-cell',
-  },
-  {
-    header: 'Phone',
-    accessor: 'phone',
-    className: 'hidden lg:table-cell',
-  },
-  {
-    header: 'Address',
-    accessor: 'address',
-    className: 'hidden lg:table-cell',
-  },
-  ...(role === 'admin'
-    ? [
-        {
-          header: 'Actions',
-          accessor: 'action',
-        },
-      ]
-    : []),
-]
-const renderRow = (item) => {
-  return (
-    <TableRow key={item.id}>
-      <TableCell className='flex items-center gap-2'>
-        <Image
-          src={item.img || '/noAvatar.png'}
-          alt={item.name}
-          width={40}
-          height={40}
-          className='md:hidden xl:block w-10 h-10 rounded-full object-cover'
-        />
-        <div className='flex flex-col gap-1'>
-          <h3 className='font-bold text-md'>{item.name}</h3>
-          <p className='font-extralight text-sm'>{item.class.name}</p>
-        </div>
-      </TableCell>
-      <TableCell className='hidden md:table-cell'>{item.id}</TableCell>
-      <TableCell className='hidden md:table-cell'>
-        {item.class.name[0]}
-      </TableCell>
-      <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
-      <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
-      <TableCell className='table-cell'>
-        {role === 'admin' && (
-          <div className='flex gap-2'>
-            <Link href={`/list/students/${item.id}`}>
-              <Button className='flex items-center justify-center rounded-full w-7 h-7'>
-                <Book />
-              </Button>
-            </Link>
-            <FormContainer type='update' table='student' data={item} />
-            <FormContainer type='delete' table='student' id={item.id} />
-          </div>
-        )}
-      </TableCell>
-    </TableRow>
-  )
-}
-
 const StudentListPage = async ({ searchParams }) => {
   const { page, ...queryParams } = await searchParams
   let p = page ? parseInt(page) : 1
+  const { sessionClaims } = await auth()
+  const role = sessionClaims.metadata?.role
 
   const query = {}
 
@@ -129,6 +55,80 @@ const StudentListPage = async ({ searchParams }) => {
       where: query,
     }),
   ])
+
+  const columns = [
+    {
+      header: 'Info',
+      accessor: 'info',
+    },
+    {
+      header: 'Student ID',
+      accessor: 'studentId',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Grade',
+      accessor: 'grade',
+      className: 'hidden md:table-cell',
+    },
+    {
+      header: 'Phone',
+      accessor: 'phone',
+      className: 'hidden lg:table-cell',
+    },
+    {
+      header: 'Address',
+      accessor: 'address',
+      className: 'hidden lg:table-cell',
+    },
+    ...(role === 'admin'
+      ? [
+          {
+            header: 'Actions',
+            accessor: 'action',
+          },
+        ]
+      : []),
+  ]
+  const renderRow = (item) => {
+    return (
+      <TableRow key={item.id}>
+        <TableCell className='flex items-center gap-2'>
+          <Image
+            src={item.img || '/noAvatar.png'}
+            alt={item.name}
+            width={40}
+            height={40}
+            className='md:hidden xl:block w-10 h-10 rounded-full object-cover'
+          />
+          <div className='flex flex-col gap-1'>
+            <h3 className='font-bold text-md'>{item.name}</h3>
+            <p className='font-extralight text-sm'>{item.class.name}</p>
+          </div>
+        </TableCell>
+        <TableCell className='hidden md:table-cell'>{item.id}</TableCell>
+        <TableCell className='hidden md:table-cell'>
+          {item.class.name[0]}
+        </TableCell>
+        <TableCell className='hidden lg:table-cell'>{item.phone}</TableCell>
+        <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
+        <TableCell className='table-cell'>
+          {role === 'admin' && (
+            <div className='flex gap-2'>
+              <Link href={`/list/students/${item.id}`}>
+                <Button className='flex items-center justify-center rounded-full w-7 h-7'>
+                  <Book />
+                </Button>
+              </Link>
+              <FormContainer type='update' table='student' data={item} />
+              <FormContainer type='delete' table='student' id={item.id} />
+            </div>
+          )}
+        </TableCell>
+      </TableRow>
+    )
+  }
+
   return (
     <div className='flex-1 bg-card m-4 mt-2 rounded-xl p-4'>
       {/* TOP Element */}
