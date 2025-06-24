@@ -1,6 +1,7 @@
 import Announcement from '@/components/Announcement'
 import BigCalendar from '@/components/BigCalendar'
 import { StackedChart } from '@/components/StackedChart'
+import { prisma } from '@/lib/prisma'
 import {
   Calendar1,
   ClipboardList,
@@ -14,7 +15,16 @@ import {
 import Image from 'next/image'
 import Link from 'next/link'
 
-const SingleStudentPage = () => {
+const SingleStudentPage = async ({ params }) => {
+  const id = await params.id
+  const student = await prisma.student.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      class: { include: { _count: { select: { lessons: true } } } },
+    },
+  })
   return (
     <div className='flex-1 p-4 flex flex-col gap-4 lg:flex-row'>
       {/* Left */}
@@ -25,7 +35,7 @@ const SingleStudentPage = () => {
           <div className='flex-1 flex gap-4 px-4 py-4 rounded-md bg-sky-400'>
             <div className='w-1/3'>
               <Image
-                src='https://images.pexels.com/photos/1102341/pexels-photo-1102341.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                src={student.img || '/noAvatar.png'}
                 alt='profileImg'
                 width={140}
                 height={140}
@@ -33,26 +43,31 @@ const SingleStudentPage = () => {
               />
             </div>
             <div className='w-2/3 flex flex-col gap-4 justify-between'>
-              <h1 className='text-xl font-bold'>Jan Smith</h1>
+              <h1 className='text-xl font-bold'>
+                {student.name + ' ' + student.surname}
+              </h1>
               <p className='text-sm'>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
               </p>
               <div className='flex items-center justify-between gap-2 flex-wrap text-sm font-medium '>
                 <div className='flex items-center gap-2 w-full md:w-1/3 lg:w-full'>
                   <Droplet className='w-[14px] h-[14px]' />
-                  <span>A+</span>
+                  <span>{student.bloodType}</span>
                 </div>
                 <div className='flex items-center gap-2 w-full md:w-1/3 lg:w-full'>
                   <Calendar1 className='w-[14px] h-[14px]' />
-                  <span>January,2025</span>
+                  <span>
+                    {' '}
+                    {new Date(student.birthday).toLocaleDateString('en-IN')}
+                  </span>
                 </div>
                 <div className='flex items-center gap-2 w-full md:w-1/3 lg:w-full'>
                   <MailIcon className='w-[14px] h-[14px]' />
-                  <span>Johndoe@example.com</span>
+                  <span>{student.email || '-'}</span>
                 </div>
                 <div className='flex items-center gap-2 w-full md:w-1/3 lg:w-full'>
                   <Phone className='w-[14px] h-[14px]' />
-                  <span>123456789</span>
+                  <span>{student.phone || '-'}</span>
                 </div>
               </div>
             </div>
@@ -73,7 +88,9 @@ const SingleStudentPage = () => {
             lg:w-[45%] 2xl:w-[48%]'>
               <ClipboardList className='w-6 h-6' />
               <div>
-                <h1 className='text-lg font-semibold'>6th</h1>
+                <h1 className='text-lg font-semibold'>
+                  {student.class.name.charAt(0)}th
+                </h1>
                 <p className='text-sm'>Grade</p>
               </div>
             </div>
@@ -82,7 +99,9 @@ const SingleStudentPage = () => {
             lg:w-[45%] 2xl:w-[48%]'>
               <NotebookPen className='w-6 h-6' />
               <div>
-                <h1 className='text-lg font-semibold'>18</h1>
+                <h1 className='text-lg font-semibold'>
+                  {student.class._count.lessons}
+                </h1>
                 <p className='text-sm'>Lessons</p>
               </div>
             </div>
@@ -111,20 +130,28 @@ const SingleStudentPage = () => {
           <div className='flex flex-wrap gap-4 text-xs mt-4'>
             <Link
               className='p-3 bg-sky-400 rounded-md'
-              href={`/list/lessons?classId=${'2'}`}>
+              href={`/list/lessons?classId=${student.class.id}`}>
               Student&apos;s Lessons
             </Link>
-            <Link className='p-3 bg-purple-400 rounded-md' href='/'>
+            <Link
+              className='p-3 bg-purple-400 rounded-md'
+              href={`/list/teachers?classId=${student.class.id}`}>
               Student&apos;s Teachers
             </Link>
-            <Link className='p-3 bg-yellow-400 rounded-md' href='/'>
-              Student&apos; Results
+            <Link
+              className='p-3 bg-yellow-400 rounded-md'
+              href={`/list/exams?classId=${student.class.id}`}>
+              Student&apos; Exams
             </Link>
-            <Link className='p-3 bg-pink-400 rounded-md' href='/'>
-              Student&apos;s Exams
-            </Link>
-            <Link className='p-3 bg-sky-400 rounded-md' href='/'>
+            <Link
+              className='p-3 bg-pink-400 rounded-md'
+              href={`/list/assignments?classId=${student.class.id}`}>
               Student&apos;s Assignments
+            </Link>
+            <Link
+              className='p-3 bg-sky-400 rounded-md'
+              href={`/list/results?studentId=${student.id}`}>
+              Student&apos;s results
             </Link>
           </div>
         </div>

@@ -5,7 +5,14 @@ import { Button } from './ui/button'
 import { Plus, SquarePenIcon, Trash } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
-import { deleteClass, deleteSubject, deleteTeacher } from '@/lib/action'
+import {
+  deleteAssignment,
+  deleteClass,
+  deleteExam,
+  deleteStudent,
+  deleteSubject,
+  deleteTeacher,
+} from '@/lib/action'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
@@ -21,15 +28,21 @@ const SubjectForm = dynamic(() => import('./forms/SubjectForm'), {
 const ClassForm = dynamic(() => import('./forms/ClassForm'), {
   loading: () => <h1>Loading...!</h1>,
 })
+const ExamForm = dynamic(() => import('./forms/ExamForm'), {
+  loading: () => <h1>Loading...!</h1>,
+})
+const AssignmentForm = dynamic(() => import('./forms/AssignmentForm'), {
+  loading: () => <h1>Loading...!</h1>,
+})
 
 const deleteActionMap = {
   subject: deleteSubject,
   teacher: deleteTeacher,
-  student: deleteSubject,
+  student: deleteStudent,
   parent: deleteSubject,
-  assignment: deleteSubject,
+  assignment: deleteAssignment,
   class: deleteClass,
-  exam: deleteSubject,
+  exams: deleteExam,
   announcement: deleteSubject,
   result: deleteSubject,
 }
@@ -65,6 +78,22 @@ const FormModel = ({ table, type, data, id, relatedData }) => {
     ),
     class: (type, data, setOpen, relatedData) => (
       <ClassForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
+    ),
+    exams: (type, data, setOpen, relatedData) => (
+      <ExamForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
+    ),
+    assignment: (type, data, setOpen, relatedData) => (
+      <AssignmentForm
         type={type}
         data={data}
         setOpen={setOpen}

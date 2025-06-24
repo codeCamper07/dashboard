@@ -1,6 +1,7 @@
 import Announcement from '@/components/Announcement'
 import BigCalendar from '@/components/BigCalendar'
 import { StackedChart } from '@/components/StackedChart'
+import { prisma } from '@/lib/prisma'
 import {
   Calendar1,
   ClipboardList,
@@ -13,8 +14,27 @@ import {
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
-const SingleTeacherPage = () => {
+const SingleTeacherPage = async ({ params }) => {
+  const id = await params.id
+  const teacher = await prisma.teacher.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      _count: {
+        select: {
+          subjects: true,
+          lessons: true,
+          classes: true,
+        },
+      },
+    },
+  })
+  if (!teacher) {
+    return notFound()
+  }
   return (
     <div className='flex-1 p-4 flex flex-col gap-4 lg:flex-row'>
       {/* Left */}
@@ -25,7 +45,7 @@ const SingleTeacherPage = () => {
           <div className='flex-1 flex gap-4 px-4 py-4 rounded-md bg-sky-400'>
             <div className='w-1/3'>
               <Image
-                src='https://images.pexels.com/photos/2888150/pexels-photo-2888150.jpeg?auto=compress&cs=tinysrgb&w=1200'
+                src={teacher.img || '/noAvatar.png'}
                 alt='profileImg'
                 width={140}
                 height={140}
@@ -33,26 +53,30 @@ const SingleTeacherPage = () => {
               />
             </div>
             <div className='w-2/3 flex flex-col gap-4 justify-between'>
-              <h1 className='text-xl font-bold'>John Doe</h1>
+              <h1 className='text-xl font-bold'>
+                {teacher.name + ' ' + teacher.surname}
+              </h1>
               <p className='text-sm'>
                 Lorem ipsum dolor sit amet consectetur adipisicing elit.
               </p>
               <div className='flex items-center justify-between gap-2 flex-wrap text-sm font-medium '>
                 <div className='flex items-center gap-2 w-full md:w-1/3 lg:w-full'>
                   <Droplet className='w-[14px] h-[14px]' />
-                  <span>A+</span>
+                  <span>{teacher.bloodType}</span>
                 </div>
                 <div className='flex items-center gap-2 w-full md:w-1/3 lg:w-full'>
                   <Calendar1 className='w-[14px] h-[14px]' />
-                  <span>January,2025</span>
+                  <span>
+                    {new Date(teacher.birthday).toLocaleDateString('en-IN')}
+                  </span>
                 </div>
                 <div className='flex items-center gap-2 w-full md:w-1/3 lg:w-full'>
                   <MailIcon className='w-[14px] h-[14px]' />
-                  <span>Johndoe@example.com</span>
+                  <span>{teacher.email || '-'}</span>
                 </div>
                 <div className='flex items-center gap-2 w-full md:w-1/3 lg:w-full'>
                   <Phone className='w-[14px] h-[14px]' />
-                  <span>123456789</span>
+                  <span>{teacher.phone || '-'}</span>
                 </div>
               </div>
             </div>
@@ -73,7 +97,9 @@ const SingleTeacherPage = () => {
             lg:w-[45%] 2xl:w-[48%]'>
               <ClipboardList className='w-6 h-6' />
               <div>
-                <h1 className='text-lg font-semibold'>2</h1>
+                <h1 className='text-lg font-semibold'>
+                  {teacher._count.subjects}
+                </h1>
                 <p className='text-sm'>Branches</p>
               </div>
             </div>
@@ -82,7 +108,9 @@ const SingleTeacherPage = () => {
             lg:w-[45%] 2xl:w-[48%]'>
               <NotebookPen className='w-6 h-6' />
               <div>
-                <h1 className='text-lg font-semibold'>6</h1>
+                <h1 className='text-lg font-semibold'>
+                  {teacher._count.lessons}
+                </h1>
                 <p className='text-sm'>Lessons</p>
               </div>
             </div>
@@ -91,7 +119,9 @@ const SingleTeacherPage = () => {
             lg:w-[45%] 2xl:w-[48%]'>
               <LaptopMinimalCheck className='w-6 h-6' />
               <div>
-                <h1 className='text-lg font-semibold'>6</h1>
+                <h1 className='text-lg font-semibold'>
+                  {teacher._count.classes}
+                </h1>
                 <p className='text-sm'>Classes</p>
               </div>
             </div>
@@ -111,21 +141,27 @@ const SingleTeacherPage = () => {
           <div className='flex flex-wrap gap-4 text-xs mt-4'>
             <Link
               className='p-3 bg-sky-400 rounded-md'
-              href={`/list/classes?supervisorId=${'teacher2'}`}>
+              href={`/list/classes?supervisorId=${teacher.id}`}>
               Teacher&apos;s Classes
             </Link>
             <Link
               className='p-3 bg-purple-400 rounded-md'
-              href={`/list/students?teacherId=${'teacher2'}`}>
+              href={`/list/students?teacherId=${teacher.id}`}>
               Teacher&apos;s Students
             </Link>
-            <Link className='p-3 bg-yellow-400 rounded-md' href='/'>
+            <Link
+              className='p-3 bg-yellow-400 rounded-md'
+              href={`/list/lessons?teacherId=${teacher.id}`}>
               Teacher&apos;s Lesson&apos;s
             </Link>
-            <Link className='p-3 bg-pink-400 rounded-md' href='/'>
+            <Link
+              className='p-3 bg-pink-400 rounded-md'
+              href={`/list/exams?teacherId=${teacher.id}`}>
               Teacher&apos;s Exams
             </Link>
-            <Link className='p-3 bg-sky-400 rounded-md' href='/'>
+            <Link
+              className='p-3 bg-sky-400 rounded-md'
+              href={`/list/assignments?teacherId=${teacher.id}`}>
               Teacher&apos;s Assignments
             </Link>
           </div>

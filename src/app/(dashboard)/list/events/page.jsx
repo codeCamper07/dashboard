@@ -105,11 +105,14 @@ const EventListPage = async ({ searchParams }) => {
     student: { students: { some: { id: userId } } },
     parent: { students: { some: { parentId: userId } } },
   }
-  query.OR = [{ classId: null }, { class: roleConditions[role] || {} }]
 
   const [data, count] = await prisma.$transaction([
     prisma.event.findMany({
-      where: query,
+      where: {
+        ...(role !== 'admin' && {
+          OR: [{ classId: null }, { class: roleConditions[role] || {} }],
+        }),
+      },
       include: { class: { select: { name: true } } },
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),

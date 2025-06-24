@@ -86,7 +86,11 @@ const AnnouncementListPage = async ({ searchParams }) => {
 
   const [data, count] = await prisma.$transaction([
     prisma.announcement.findMany({
-      where: query,
+      where: {
+        ...(role !== 'admin' && {
+          OR: [{ classId: null }, { class: roleConditions[role] || {} }],
+        }),
+      },
       include: {
         class: true,
       },

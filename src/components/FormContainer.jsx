@@ -1,8 +1,14 @@
 import { prisma } from '@/lib/prisma'
 import FormModel from './FormModel'
+import { auth } from '@clerk/nextjs/server'
 
 const FormContainer = async ({ table, type, data, id }) => {
+  const { sessionClaims, userId } = await auth()
+  const role = sessionClaims?.metadata.role
+  const currentUserId = userId
+
   let relatedData = {}
+
   if (type !== 'delete') {
     switch (table) {
       case 'subject':
@@ -25,6 +31,33 @@ const FormContainer = async ({ table, type, data, id }) => {
           select: { id: true, name: true },
         })
         relatedData = { subjects: teacherSubjects }
+        break
+      case 'student':
+        const studentGrades = await prisma.grade.findMany({
+          select: { id: true, level: true },
+        })
+        const studentClasses = await prisma.class.findMany({
+          include: { _count: { select: { students: true } } },
+        })
+        relatedData = { classes: studentClasses, grades: studentGrades }
+        break
+      case 'exams':
+        const examLessons = await prisma.lesson.findMany({
+          where: {
+            ...(role === 'teacher' ? { teacherId: currentUserId } : {}),
+          },
+          select: { id: true, name: true },
+        })
+        relatedData = { lessons: examLessons }
+        break
+      case 'assignment':
+        const assignmentLessons = await prisma.lesson.findMany({
+          where: {
+            ...(role === 'teacher' ? { teacherId: currentUserId } : {}),
+          },
+          select: { id: true, name: true },
+        })
+        relatedData = { lessons: assignmentLessons }
         break
       default:
         break

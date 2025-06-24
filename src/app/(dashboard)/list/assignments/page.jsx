@@ -1,4 +1,3 @@
-import FormModel from '@/components/FormModel'
 import PaginationComponent from '@/components/Pagination'
 import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
@@ -8,6 +7,7 @@ import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
 import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
+import FormContainer from '@/components/FormContainer'
 
 const { sessionClaims, userId } = await auth()
 const role = sessionClaims.metadata?.role
@@ -54,8 +54,8 @@ const renderRow = (item) => {
       <TableCell className='table-cell'>
         {(role === 'admin' || role === 'teacher') && (
           <div className='flex gap-2'>
-            <FormModel type='update' data={item} table='assignments' />
-            <FormModel type='delete' id={item.id} table='assignments' />
+            <FormContainer type='update' data={item} table='assignment' />
+            <FormContainer type='delete' id={item.id} table='assignment' />
           </div>
         )}
       </TableCell>
@@ -153,7 +153,7 @@ const AssignmentListPage = async ({ searchParams }) => {
               <ArrowDownWideNarrow />
             </Button>
             {(role === 'admin' || role === 'teacher') && (
-              <FormModel type='create' table='assignments' />
+              <FormContainer type='create' table='assignment' />
             )}
           </div>
         </div>

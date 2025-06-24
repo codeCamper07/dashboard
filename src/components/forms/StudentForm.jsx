@@ -6,38 +6,77 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '../ui/button'
 import InputFeilds from '../InputFeilds'
 import { Upload } from 'lucide-react'
+import { CldUploadWidget } from 'next-cloudinary'
+import { startTransition, useActionState, useEffect } from 'react'
+import { toast } from 'sonner'
+import { createStudent, updateStudent } from '@/lib/action'
+import { useRouter } from 'next/navigation'
 
 const schema = z.object({
+  id: z.string().optional(),
   username: z
     .string()
-    .min(3, { message: 'Username must be at least 3 characters long' })
-    .max(20, { message: 'Username must be at most 20 characters long' }),
-  email: z.string().email({ message: 'Invalid email address' }),
+    .min(3, { message: 'Username must be at least 3 characters long!' })
+    .max(20, { message: 'Username must be at most 20 characters long!' }),
   password: z
     .string()
-    .min(8, { message: 'Password must be at least 8 characters long' }),
-  firstname: z.string().min(1, { message: 'First name is required' }),
-  lastname: z.string().min(1, { message: 'Last name is required' }),
-  phone: z.string().min(1, { message: 'Phone number is required' }),
-  address: z.string().min(1, { message: 'Address is required' }),
-  bloodType: z.string().min(1, { message: 'Blood type is required' }),
-  birthday: z.date({ message: 'Birthday must be a valid date' }),
-  gender: z.enum(['male', 'female'], { message: 'Select a Gender' }),
-  img: z.instanceof(File, { message: 'Image must be a file' }),
+    .min(8, { message: 'Password must be at least 8 characters long!' })
+    .optional()
+    .or(z.literal('')),
+  name: z.string().min(1, { message: 'First name is required!' }),
+  surname: z.string().min(1, { message: 'Last name is required!' }),
+  email: z
+    .string()
+    .email({ message: 'Invalid email address!' })
+    .optional()
+    .or(z.literal('')),
+  phone: z.string().optional(),
+  address: z.string(),
+  img: z.string().optional(),
+  bloodType: z.string().min(1, { message: 'Blood Type is required!' }),
+  birthday: z.coerce.date({ message: 'Birthday is required!' }),
+  sex: z.enum(['MALE', 'FEMALE'], { message: 'Sex is required!' }),
+  gradeId: z.coerce.number().min(1, { message: 'Grade is required!' }),
+  classId: z.coerce.number().min(1, { message: 'Class is required!' }),
+  parentId: z.string().min(1, { message: 'Parent Id is required!' }),
 })
 
-const StudentForm = ({ type, data }) => {
+const StudentForm = ({ type, data, setOpen, relatedData }) => {
   const {
     register,
+    setValue,
     handleSubmit,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(schema),
   })
 
-  const onSubmit = handleSubmit((data) => {
-    console.log('Form submitted:', data)
+  const router = useRouter()
+
+  const [state, formAction] = useActionState(
+    type === 'create' ? createStudent : updateStudent,
+    {
+      success: false,
+      error: false,
+    },
+  )
+  const onSubmit = handleSubmit((formData) => {
+    startTransition(() => formAction(formData))
   })
+
+  useEffect(() => {
+    if (state.success) {
+      toast.success(
+        type === 'create'
+          ? 'Student Profile created successfully!'
+          : 'Student Profile updated successfully!',
+      )
+      setOpen(false)
+      router.refresh()
+    }
+  }, [state])
+
+  const { classes, grades } = relatedData
 
   return (
     <form className='flex flex-col gap-8' onSubmit={onSubmit}>
@@ -71,17 +110,17 @@ const StudentForm = ({ type, data }) => {
       <div className='flex justify-between gap-4 flex-wrap'>
         <InputFeilds
           label='First Name'
-          name='firstname'
+          name='name'
           register={register}
-          defaultValue={data?.firstname}
-          errors={errors?.firstname}
+          defaultValue={data?.name}
+          errors={errors?.name}
         />
         <InputFeilds
           label='Last Name'
-          name='lastname'
+          name='surname'
           register={register}
-          defaultValue={data?.lastname}
-          errors={errors?.lastname}
+          defaultValue={data?.surname}
+          errors={errors?.surname}
         />
         <InputFeilds
           label='Phone'
@@ -110,36 +149,100 @@ const StudentForm = ({ type, data }) => {
           name='birthday'
           type='date'
           register={register}
-          defaultValue={data?.birthday}
+          defaultValue={data?.birthday.toISOString().split('T')[0]}
           errors={errors?.birthday}
         />
+        <InputFeilds
+          label='Parent Id'
+          name='parentId'
+          defaultValue={data?.parentId}
+          register={register}
+          error={errors.parentId}
+        />
+        {data && (
+          <InputFeilds
+            label='Id'
+            name='id'
+            defaultValue={data?.id}
+            register={register}
+            error={errors?.id}
+            hidden
+            disabled={true}
+          />
+        )}
         <div className='flex flex-col gap-2 w-full md:w-1/4'>
           <label className='text-xs'>Gender</label>
           <select
             className='ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full'
             {...register('sex')}
-            defaultValue={data?.gender}>
-            <option value='male'>Male</option>
-            <option value='female'>female</option>
+            defaultValue={data?.sex}>
+            <option value='MALE'>Male</option>
+            <option value='FEMALE'>female</option>
           </select>
           {errors?.message && (
             <p className='text-red-500 text-xs'>{errors?.message.toString()}</p>
           )}
         </div>
-        <div className='flex flex-col gap-4 w-full md:w-1/4'>
-          <label
-            className='text-xs flex items-center gap-2 cursor-pointer'
-            htmlFor='img'>
-            <Upload className='w-[14px] h-[14px]' />
-            <span>Upload a photo</span>
-          </label>
-          <input type='file' id='img' {...register('img')} className='hidden' />
-          {errors.img?.message && (
-            <p className='text-xs text-red-500'>
-              {errors?.img.message.toString()}
+        <div className='flex flex-col gap-2 w-full md:w-1/4'>
+          <label className='text-xs text-gray-500'>Grade</label>
+          <select
+            className='ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full'
+            {...register('gradeId')}
+            defaultValue={data?.gradeId}>
+            {grades.map((grade) => (
+              <option value={grade.id} key={grade.id}>
+                {grade.level}
+              </option>
+            ))}
+          </select>
+          {errors.gradeId?.message && (
+            <p className='text-xs text-red-400'>
+              {errors.gradeId.message.toString()}
             </p>
           )}
         </div>
+        <div className='flex flex-col gap-2 w-full md:w-1/4'>
+          <label className='text-xs text-gray-500'>Class</label>
+          <select
+            className='ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full'
+            {...register('classId')}
+            defaultValue={data?.classId}>
+            {classes.map((classItem) => (
+              <option value={classItem.id} key={classItem.id}>
+                ({classItem.name} -{' '}
+                {classItem._count.students + '/' + classItem.capacity} Capacity)
+              </option>
+            ))}
+          </select>
+          {errors.classId?.message && (
+            <p className='text-xs text-red-400'>
+              {errors.classId.message.toString()}
+            </p>
+          )}
+        </div>
+        <input hidden {...register('img')} defaultValue={data?.img} />
+        <CldUploadWidget
+          uploadPreset='school'
+          onSuccess={(result, { widget }) => {
+            setValue('img', result.info.secure_url)
+            widget.close()
+          }}>
+          {({ open }) => {
+            return (
+              <div
+                className='flex flex-col gap-2 w-full md:w-1/4'
+                onClick={() => open()}>
+                <label className='text-xs flex items-center gap-2 cursor-pointer'>
+                  <Upload className='w-[14px] h-[14px]' />
+                  <span>Upload Image</span>
+                </label>
+              </div>
+            )
+          }}
+        </CldUploadWidget>
+        {state.error && (
+          <span className='text-xs text-destructive'>{state.errorMessage}</span>
+        )}
       </div>
       <Button>{type === 'create' ? 'Create' : 'Update'}</Button>
     </form>

@@ -105,12 +105,7 @@ const SubjectListPage = async ({ searchParams }) => {
               <ArrowDownWideNarrow />
             </Button>
             {role === 'admin' && (
-              // <Button className='rounded-full w-8 h-8 flex items-center justify-center'>
-              //   <Plus />
-              // </Button>
-              <>
-                <FormContainer type='create' table='subject' />
-              </>
+              <FormContainer type='create' table='subject' />
             )}
           </div>
         </div>

@@ -1,4 +1,3 @@
-import FormModel from '@/components/FormModel'
 import PaginationComponent from '@/components/Pagination'
 import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
@@ -10,6 +9,7 @@ import { ArrowDownWideNarrow, Book, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
+import FormContainer from '@/components/FormContainer'
 
 const { sessionClaims } = await auth()
 const role = sessionClaims.metadata?.role
@@ -78,8 +78,8 @@ const renderRow = (item) => {
                 <Book />
               </Button>
             </Link>
-            <FormModel type='update' table='student' data={item} />
-            <FormModel type='delete' table='student' id={item.id} />
+            <FormContainer type='update' table='student' data={item} />
+            <FormContainer type='delete' table='student' id={item.id} />
           </div>
         )}
       </TableCell>
@@ -144,10 +144,7 @@ const StudentListPage = async ({ searchParams }) => {
               <ArrowDownWideNarrow />
             </Button>
             {role === 'admin' && (
-              // <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              //   <Plus />
-              // </Button>
-              <FormModel type='create' table='student' />
+              <FormContainer type='create' table='student' />
             )}
           </div>
         </div>

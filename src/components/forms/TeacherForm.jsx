@@ -7,7 +7,7 @@ import { Button } from '../ui/button'
 import InputFeilds from '../InputFeilds'
 import { Upload } from 'lucide-react'
 import { createTeacher, updateTeacher } from '@/lib/action'
-import { startTransition, useActionState, useEffect, useState } from 'react'
+import { startTransition, useActionState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import { CldUploadWidget } from 'next-cloudinary'
@@ -20,13 +20,16 @@ const schema = z.object({
     .max(20, { message: 'Username must be at most 20 characters long' }),
   password: z
     .string()
-    .min(8, { message: 'Password must be at least 8 characters long' }),
+    .min(8, { message: 'Password must be at least 8 characters long' })
+    .optional()
+    .or(z.literal('')),
   name: z.string().min(1, { message: 'First name is required' }),
   surname: z.string().min(1, { message: 'Last name is required' }),
   email: z
     .string()
     .email({ message: 'Invalid email address' })
-    .optional(z.literal('')),
+    .optional()
+    .or(z.literal('')),
   phone: z.string().optional(),
   address: z.string().min(1, { message: 'Address is required' }),
   img: z.string().optional(),
@@ -45,9 +48,9 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
   } = useForm({
     resolver: zodResolver(schema),
   })
+  console.log({ data })
 
   const router = useRouter()
-  const [img, setImg] = useState('')
 
   const [state, formAction] = useActionState(
     type === 'create' ? createTeacher : updateTeacher,
@@ -149,9 +152,20 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
           name='birthday'
           type='date'
           register={register}
-          defaultValue={data?.birthday}
+          defaultValue={data?.birthday.toISOString().split('T')[0]}
           errors={errors?.birthday}
         />
+        {data && (
+          <InputFeilds
+            label='Id'
+            name='id'
+            defaultValue={data?.id}
+            register={register}
+            error={errors?.id}
+            hidden
+            disabled={true}
+          />
+        )}
         <div className='flex flex-col gap-2 w-full md:w-1/4'>
           <label className='text-xs'>Gender</label>
           <select
@@ -171,7 +185,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
             multiple
             className='ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full'
             {...register('subjects')}
-            defaultValue={data?.subjects}>
+            defaultValue={[data?.subjects]}>
             {subjects.map((subject) => (
               <option key={subject.id} value={subject.id}>
                 {subject.name}
@@ -184,11 +198,10 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
             </p>
           )}
         </div>
-        <input hidden {...register('img')} />
+        <input hidden {...register('img')} defaultValue={data?.img} />
         <CldUploadWidget
           uploadPreset='school'
           onSuccess={(result, { widget }) => {
-            setImg(result.info.secure_url)
             setValue('img', result.info.secure_url)
             widget.close()
           }}>
@@ -205,6 +218,9 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
             )
           }}
         </CldUploadWidget>
+        {state.error && (
+          <span className='text-xs text-destructive'>{state.errorMessage}</span>
+        )}
       </div>
       <Button>{type === 'create' ? 'Create' : 'Update'}</Button>
     </form>

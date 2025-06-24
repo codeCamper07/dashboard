@@ -57,9 +57,6 @@ const renderRow = (item) => {
       <TableCell className='hidden lg:table-cell'>{item.address}</TableCell>
       <TableCell className='table-cell'>
         {role === 'admin' && (
-          // <Button className='rounded-full w-7 h-7 flex items-center justify-center'>
-          //   <Trash2 />
-          // </Button>
           <div className='flex gap-2'>
             <FormModel type='update' table='parents' data={item} />
             <FormModel type='delete' table='parents' id={item.id} />
@@ -120,12 +117,7 @@ const ParentListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <ArrowDownWideNarrow />
             </Button>
-            {role === 'admin' && (
-              // <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              //   <Plus />
-              // </Button>
-              <FormModel type='create' table='parents' />
-            )}
+            {role === 'admin' && <FormModel type='create' table='parents' />}
           </div>
         </div>
       </div>
