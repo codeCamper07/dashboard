@@ -100,7 +100,7 @@ const ClassForm = ({ type, data, setOpen, relatedData }) => {
             ))}
           </select>
           {errors?.supervisorId?.message && (
-            <p className='text-red-500 text-xs'>
+            <p className='text-destructive text-xs'>
               {errors?.supervisorId?.message.toString()}
             </p>
           )}
@@ -121,7 +121,7 @@ const ClassForm = ({ type, data, setOpen, relatedData }) => {
             ))}
           </select>
           {errors?.gradeId?.message && (
-            <p className='text-red-500 text-xs'>
+            <p className='text-destructive text-xs'>
               {errors?.gradeId?.message.toString()}
             </p>
           )}

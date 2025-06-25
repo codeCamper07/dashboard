@@ -176,7 +176,9 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
             <option value='FEMALE'>female</option>
           </select>
           {errors?.message && (
-            <p className='text-red-500 text-xs'>{errors?.message.toString()}</p>
+            <p className='text-destructive text-xs'>
+              {errors?.message.toString()}
+            </p>
           )}
         </div>
         <div className='flex flex-col gap-2 w-full md:w-1/4'>
@@ -193,7 +195,7 @@ const TeacherForm = ({ type, data, setOpen, relatedData }) => {
             ))}
           </select>
           {errors?.subjects?.message && (
-            <p className='text-red-500 text-xs'>
+            <p className='text-destructive text-xs'>
               {errors.subjects.message.toString()}
             </p>
           )}

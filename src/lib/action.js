@@ -460,3 +460,41 @@ export const deleteAssignment = async (currentState, data) => {
     return { success: false, error: true }
   }
 }
+
+export const createGrade = async (currentState, data) => {
+  try {
+    const gradeFind = await prisma.grade.findFirst({
+      where: {
+        level: data.level,
+      },
+    })
+    if (gradeFind) {
+      return { success: false, error: true, errorMessage: 'Grade Level Exists' }
+    } else {
+      await prisma.grade.create({
+        data: {
+          level: data.level,
+        },
+      })
+      return { success: true, error: false }
+    }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true }
+  }
+}
+
+export const deleteGrade = async (currentState, data) => {
+  try {
+    const id = data.get('id')
+    await prisma.grade.delete({
+      where: {
+        id: parseInt(id),
+      },
+    })
+    return { success: true, error: false }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true }
+  }
+}

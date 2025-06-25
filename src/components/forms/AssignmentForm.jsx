@@ -107,7 +107,9 @@ const AssignmentForm = ({ type, data, setOpen, relatedData }) => {
             ))}
           </select>
           {errors?.lessons && (
-            <p className='text-red-500 text-xs'>{errors?.lessons.toString()}</p>
+            <p className='text-destructive text-xs'>
+              {errors?.lessons.toString()}
+            </p>
           )}
         </div>
       </div>

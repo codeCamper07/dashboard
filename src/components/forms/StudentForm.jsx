@@ -180,7 +180,9 @@ const StudentForm = ({ type, data, setOpen, relatedData }) => {
             <option value='FEMALE'>female</option>
           </select>
           {errors?.message && (
-            <p className='text-red-500 text-xs'>{errors?.message.toString()}</p>
+            <p className='text-destructive text-xs'>
+              {errors?.message.toString()}
+            </p>
           )}
         </div>
         <div className='flex flex-col gap-2 w-full md:w-1/4'>

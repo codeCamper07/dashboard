@@ -13,6 +13,7 @@ import {
   Calendar,
   Megaphone,
   CalendarHeart,
+  ListOrdered,
 } from 'lucide-react'
 
 import {
@@ -79,6 +80,12 @@ const AppSidebar = async () => {
       url: '/list/lessons',
       icon: NotebookPen,
       visible: ['admin', 'teacher'],
+    },
+    {
+      title: 'Grades',
+      url: '/list/grades',
+      icon: ListOrdered,
+      visible: ['admin'],
     },
     {
       title: 'Exam',
