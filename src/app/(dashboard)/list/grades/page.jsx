@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
-import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
+import TableSort from '@/components/TableSort'
 
 const GradeListPage = async ({ searchParams }) => {
-  const { page, ...queryParams } = await searchParams
+  const { page, order, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
 
   const { sessionClaims } = await auth()
@@ -46,6 +47,9 @@ const GradeListPage = async ({ searchParams }) => {
       include: { classess: { select: { name: true } } },
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
+      orderBy: {
+        level: order,
+      },
     }),
     prisma.grade.count({
       where: query,
@@ -104,9 +108,7 @@ const GradeListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <SlidersHorizontal />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <ArrowDownWideNarrow />
-            </Button>
+            <TableSort />
             {role === 'admin' && <FormModel type='create' table='grade' />}
           </div>
         </div>

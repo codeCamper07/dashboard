@@ -6,11 +6,12 @@ import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
-import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
+import TableSort from '@/components/TableSort'
 
 const ParentListPage = async ({ searchParams }) => {
-  const { page, ...queryParams } = await searchParams
+  const { page, order, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
   const { sessionClaims } = await auth()
   const role = sessionClaims.metadata?.role
@@ -42,6 +43,9 @@ const ParentListPage = async ({ searchParams }) => {
       },
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
+      orderBy: {
+        name: order,
+      },
     }),
     prisma.parent.count({
       where: query,
@@ -94,8 +98,8 @@ const ParentListPage = async ({ searchParams }) => {
         <TableCell className='table-cell'>
           {role === 'admin' && (
             <div className='flex gap-2'>
-              <FormModel type='update' table='parents' data={item} />
-              <FormModel type='delete' table='parents' id={item.id} />
+              <FormModel type='update' table='parent' data={item} />
+              <FormModel type='delete' table='parent' id={item.id} />
             </div>
           )}
         </TableCell>
@@ -114,10 +118,8 @@ const ParentListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <SlidersHorizontal />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <ArrowDownWideNarrow />
-            </Button>
-            {role === 'admin' && <FormModel type='create' table='parents' />}
+            <TableSort />
+            {role === 'admin' && <FormModel type='create' table='parent' />}
           </div>
         </div>
       </div>

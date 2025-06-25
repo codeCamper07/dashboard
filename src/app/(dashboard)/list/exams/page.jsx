@@ -5,12 +5,13 @@ import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
-import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 import FormContainer from '@/components/FormContainer'
+import TableSort from '@/components/TableSort'
 
 const ExamListPage = async ({ searchParams }) => {
-  const { page, ...queryParams } = await searchParams
+  const { page, order, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
   const { sessionClaims, userId } = await auth()
   const role = sessionClaims.metadata?.role
@@ -77,6 +78,9 @@ const ExamListPage = async ({ searchParams }) => {
       },
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
+      orderBy: {
+        title: order,
+      },
     }),
     prisma.exam.count({
       where: query,
@@ -144,9 +148,7 @@ const ExamListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <SlidersHorizontal />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <ArrowDownWideNarrow />
-            </Button>
+            <TableSort />
             {(role === 'admin' || role === 'teacher') && (
               <FormContainer type='create' table='exams' />
             )}

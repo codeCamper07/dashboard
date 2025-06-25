@@ -259,6 +259,7 @@ export const updateStudent = async (currentState, data) => {
     })
     return { success: true, error: false }
   } catch (err) {
+    console.log(err)
     return { success: false, error: true, errorMessage: err.message }
   }
 }
@@ -490,6 +491,82 @@ export const deleteGrade = async (currentState, data) => {
     await prisma.grade.delete({
       where: {
         id: parseInt(id),
+      },
+    })
+    return { success: true, error: false }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true }
+  }
+}
+export const createParent = async (currentState, data) => {
+  try {
+    console.log({ data })
+
+    const res = await clerkClient()
+    const user = await res.users.createUser({
+      username: data.username,
+      password: data.password,
+      firstName: data.name,
+      lastName: data.surname,
+      publicMetadata: { role: 'parent' },
+    })
+
+    await prisma.parent.create({
+      data: {
+        id: user.id,
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email,
+        phone: data.phone || null,
+        address: data.address,
+      },
+    })
+    return { success: true, error: false }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true, errorMessage: err.message }
+  }
+}
+
+export const updateParent = async (currentState, data) => {
+  try {
+    console.log({ data })
+    const res = await clerkClient()
+    const user = await res.users.updateUser(data.id, {
+      username: data.username,
+      ...(data.password !== '' && { password: data.password }),
+      firstName: data.name,
+      lastName: data.surname,
+    })
+
+    await prisma.parent.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        ...(data.password !== '' && { password: data.password }),
+        username: data.username,
+        name: data.name,
+        surname: data.surname,
+        email: data.email || null,
+        phone: data.phone || null,
+        address: data.address,
+      },
+    })
+    return { success: true, error: false }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true, errorMessage: err.message }
+  }
+}
+export const deleteParent = async (currentState, data) => {
+  try {
+    const id = data.get('id')
+    await prisma.parent.delete({
+      where: {
+        id: id,
       },
     })
     return { success: true, error: false }

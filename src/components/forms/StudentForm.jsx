@@ -38,7 +38,7 @@ const schema = z.object({
   sex: z.enum(['MALE', 'FEMALE'], { message: 'Sex is required!' }),
   gradeId: z.coerce.number().min(1, { message: 'Grade is required!' }),
   classId: z.coerce.number().min(1, { message: 'Class is required!' }),
-  parentId: z.string().min(1, { message: 'Parent Id is required!' }),
+  parentId: z.string().optional(),
 })
 
 const StudentForm = ({ type, data, setOpen, relatedData }) => {

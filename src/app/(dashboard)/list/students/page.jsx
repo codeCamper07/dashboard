@@ -5,14 +5,15 @@ import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
-import { ArrowDownWideNarrow, Book, SlidersHorizontal } from 'lucide-react'
+import { Book, SlidersHorizontal } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { auth } from '@clerk/nextjs/server'
 import FormContainer from '@/components/FormContainer'
+import TableSort from '@/components/TableSort'
 
 const StudentListPage = async ({ searchParams }) => {
-  const { page, ...queryParams } = await searchParams
+  const { page, order, ...queryParams } = await searchParams
   let p = page ? parseInt(page) : 1
   const { sessionClaims } = await auth()
   const role = sessionClaims.metadata?.role
@@ -50,6 +51,9 @@ const StudentListPage = async ({ searchParams }) => {
       },
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
+      orderBy: {
+        name: order,
+      },
     }),
     prisma.student.count({
       where: query,
@@ -140,9 +144,7 @@ const StudentListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <SlidersHorizontal />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <ArrowDownWideNarrow />
-            </Button>
+            <TableSort />
             {role === 'admin' && (
               <FormContainer type='create' table='student' />
             )}

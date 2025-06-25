@@ -1,4 +1,3 @@
-import FormModel from '@/components/FormModel'
 import PaginationComponent from '@/components/Pagination'
 import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
@@ -6,12 +5,13 @@ import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
-import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 import FormContainer from '@/components/FormContainer'
+import TableSort from '@/components/TableSort'
 
 const ClassesListPage = async ({ searchParams }) => {
-  const { page, ...queryParams } = await searchParams
+  const { page, order, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
   const { sessionClaims } = await auth()
   const role = sessionClaims.metadata?.role
@@ -47,6 +47,9 @@ const ClassesListPage = async ({ searchParams }) => {
       },
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
+      orderBy: {
+        name: order,
+      },
     }),
     prisma.class.count({
       where: query,
@@ -114,9 +117,7 @@ const ClassesListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <SlidersHorizontal />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <ArrowDownWideNarrow />
-            </Button>
+            <TableSort />
             {role === 'admin' && <FormContainer type='create' table='class' />}
           </div>
         </div>

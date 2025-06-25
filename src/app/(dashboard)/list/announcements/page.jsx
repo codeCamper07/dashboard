@@ -6,13 +6,14 @@ import { Button } from '@/components/ui/button'
 import { TableCell, TableRow } from '@/components/ui/table'
 import { ITEMS_PER_PAGE } from '@/lib/settings'
 import { prisma } from '@/lib/prisma'
-import { ArrowDownWideNarrow, SlidersHorizontal } from 'lucide-react'
+import { SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
+import TableSort from '@/components/TableSort'
 
 const AnnouncementListPage = async ({ searchParams }) => {
   const { sessionClaims, userId } = await auth()
   const role = sessionClaims.metadata?.role
-  const { page, ...queryParams } = await searchParams
+  const { page, order, ...queryParams } = await searchParams
   const p = page ? parseInt(page) : 1
 
   const query = {}
@@ -52,6 +53,9 @@ const AnnouncementListPage = async ({ searchParams }) => {
       },
       take: ITEMS_PER_PAGE,
       skip: ITEMS_PER_PAGE * (p - 1),
+      orderBy: {
+        title: order,
+      },
     }),
     prisma.announcement.count({
       where: query,
@@ -112,9 +116,7 @@ const AnnouncementListPage = async ({ searchParams }) => {
             <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
               <SlidersHorizontal />
             </Button>
-            <Button className='rounded-full w-8 h-8 flex items-center justify-center '>
-              <ArrowDownWideNarrow />
-            </Button>
+            <TableSort />
             {role === 'admin' && (
               <FormModel type='create' table='announcement' />
             )}
