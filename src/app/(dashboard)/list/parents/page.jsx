@@ -58,6 +58,10 @@ const ParentListPage = async ({ searchParams }) => {
       accessor: 'info',
     },
     {
+      header: 'Parent Id',
+      accessor: 'parentid',
+    },
+    {
       header: 'Student Names',
       accessor: 'student names',
       className: 'hidden md:table-cell',
@@ -90,6 +94,7 @@ const ParentListPage = async ({ searchParams }) => {
             <p className='font-extralight text-sm'>{item?.email}</p>
           </div>
         </TableCell>
+        <TableCell className='table-cell'>{item.id}</TableCell>
         <TableCell className='hidden md:table-cell'>
           {item.students.map((student) => student.name).join(',')}
         </TableCell>
