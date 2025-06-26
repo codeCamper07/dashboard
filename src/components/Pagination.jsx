@@ -5,14 +5,11 @@ import {
   PaginationContent,
   PaginationItem,
   PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
 } from '@/components/ui/pagination'
 import { ITEMS_PER_PAGE } from '@/lib/settings'
-import { cn } from '@/lib/utils'
+
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { buttonVariants } from './ui/button'
 
 const PaginationComponent = ({ page, count }) => {
   const router = useRouter()

@@ -8,17 +8,17 @@ import InputFeilds from '../InputFeilds'
 import { startTransition, useActionState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
-import { createExam, updateExam } from '@/lib/action'
+import { createAnnouncement, updateAnnouncement } from '@/lib/action'
 
 const schema = z.object({
   id: z.coerce.number().optional(),
   title: z.string().min(1, { message: 'Title name is required!' }),
-  startTime: z.coerce.date({ message: 'Start time is required!' }),
-  endTime: z.coerce.date({ message: 'End time is required!' }),
-  lessonId: z.coerce.number({ message: 'Lesson is required!' }),
+  description: z.string().min(1, { message: 'Description is required!' }),
+  date: z.coerce.date({ message: 'Date is required!' }),
+  classId: z.coerce.number({ message: 'class is required!' }).optional(),
 })
 
-const ExamForm = ({ type, data, setOpen, relatedData }) => {
+const AnnouncementForm = ({ type, data, setOpen, relatedData }) => {
   const {
     register,
     handleSubmit,
@@ -29,7 +29,7 @@ const ExamForm = ({ type, data, setOpen, relatedData }) => {
   const router = useRouter()
 
   const [state, formAction] = useActionState(
-    type === 'create' ? createExam : updateExam,
+    type === 'create' ? createAnnouncement : updateAnnouncement,
     {
       success: false,
       error: false,
@@ -43,46 +43,45 @@ const ExamForm = ({ type, data, setOpen, relatedData }) => {
     if (state.success) {
       toast.success(
         type === 'create'
-          ? 'Exam created successfully!'
-          : 'Exam updated successfully!',
+          ? 'Announcement created successfully!'
+          : 'Announcement updated successfully!',
       )
       setOpen(false)
       router.refresh()
     }
   }, [state, router, type, setOpen])
 
-  const { lessons } = relatedData
-  console.log(lessons)
+  const { classes } = relatedData
+  console.log(classes)
 
   return (
     <form className='flex flex-col gap-8' onSubmit={onSubmit}>
       <h1 className='font-xl font-semibold'>
-        {type === 'create' ? 'Create new Exam' : 'Update Exam'}
+        {type === 'create' ? 'Create new Announcement' : 'Update Announcement'}
       </h1>
-      <span className='font-light text-sm'>Exam Info</span>
+      <span className='font-light text-sm'>Announcement Info</span>
       <div className='flex justify-between gap-4 flex-wrap'>
         <InputFeilds
-          label='Exam Title'
+          label='Event Title'
           name='title'
           register={register}
           defaultValue={data?.title}
           errors={errors?.title}
         />
         <InputFeilds
-          label='Start Time'
-          name='startTime'
+          label='Event Description'
+          name='description'
           register={register}
-          defaultValue={data?.startTime}
-          errors={errors?.startTime}
-          type='datetime-local'
+          defaultValue={data?.description}
+          errors={errors?.description}
         />
         <InputFeilds
-          label='End Time'
-          name='endTime'
+          label='Date'
+          name='date'
           register={register}
-          defaultValue={data?.endTime}
-          errors={errors?.endTime}
-          type='datetime-local'
+          defaultValue={data?.date.toISOString().split('T')[0]}
+          errors={errors?.date}
+          type='date'
         />
         {data && (
           <InputFeilds
@@ -95,20 +94,20 @@ const ExamForm = ({ type, data, setOpen, relatedData }) => {
           />
         )}
         <div className='flex flex-col gap-2 w-full md:w-1/4'>
-          <label className='text-xs'>Lessons</label>
+          <label className='text-xs'>Class Id</label>
           <select
             className='ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full'
-            {...register('lessonId')}
-            defaultValue={data?.lessonId}>
-            {lessons.map((lesson) => (
-              <option value={lesson.id} key={lesson.id}>
-                {lesson.name}
+            {...register('classId')}
+            defaultValue={data?.classId}>
+            {classes.map((classe) => (
+              <option value={classe.id} key={classe.id}>
+                {classe.name}
               </option>
             ))}
           </select>
-          {errors?.lessons && (
+          {errors?.classes && (
             <p className='text-destructive text-xs'>
-              {errors?.lessons.toString()}
+              {errors?.classes.toString()}
             </p>
           )}
         </div>
@@ -121,4 +120,4 @@ const ExamForm = ({ type, data, setOpen, relatedData }) => {
   )
 }
 
-export default ExamForm
+export default AnnouncementForm

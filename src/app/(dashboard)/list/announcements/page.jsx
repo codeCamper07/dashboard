@@ -1,4 +1,3 @@
-import FormModel from '@/components/FormModel'
 import PaginationComponent from '@/components/Pagination'
 import TableComponent from '@/components/Table'
 import TableSearch from '@/components/TableSearch'
@@ -9,6 +8,7 @@ import { prisma } from '@/lib/prisma'
 import { SlidersHorizontal } from 'lucide-react'
 import { auth } from '@clerk/nextjs/server'
 import TableSort from '@/components/TableSort'
+import FormContainer from '@/components/FormContainer'
 
 const AnnouncementListPage = async ({ searchParams }) => {
   const { sessionClaims, userId } = await auth()
@@ -96,8 +96,8 @@ const AnnouncementListPage = async ({ searchParams }) => {
         <TableCell className='table-cell'>
           {role === 'admin' && (
             <div className='flex gap-2'>
-              <FormModel type='update' data={item} table='announcements' />
-              <FormModel type='delete' id={item.id} table='announcements' />
+              <FormContainer type='update' data={item} table='announcement' />
+              <FormContainer type='delete' id={item.id} table='announcement' />
             </div>
           )}
         </TableCell>
@@ -118,7 +118,7 @@ const AnnouncementListPage = async ({ searchParams }) => {
             </Button>
             <TableSort />
             {role === 'admin' && (
-              <FormModel type='create' table='announcement' />
+              <FormContainer type='create' table='announcement' />
             )}
           </div>
         </div>

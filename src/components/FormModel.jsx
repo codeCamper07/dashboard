@@ -6,10 +6,13 @@ import { Plus, SquarePenIcon, Trash } from 'lucide-react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
 import {
+  deleteAnnouncement,
   deleteAssignment,
   deleteClass,
+  deleteEvent,
   deleteExam,
   deleteGrade,
+  deleteLessons,
   deleteParent,
   deleteStudent,
   deleteSubject,
@@ -42,6 +45,16 @@ const GradeForm = dynamic(() => import('./forms/GradeForm'), {
 const ParentForm = dynamic(() => import('./forms/ParentForm'), {
   loading: () => <h1>Loading...!</h1>,
 })
+const EventForm = dynamic(() => import('./forms/EventForm'), {
+  loading: () => <h1>Loading...!</h1>,
+})
+const AnnouncementForm = dynamic(() => import('./forms/AnnouncementForm'), {
+  loading: () => <h1>Loading...!</h1>,
+})
+const LessonForm = dynamic(() => import('./forms/LessonForm'), {
+  loading: () => <h1>Loading...!</h1>,
+})
+
 const deleteActionMap = {
   subject: deleteSubject,
   teacher: deleteTeacher,
@@ -50,8 +63,10 @@ const deleteActionMap = {
   assignment: deleteAssignment,
   class: deleteClass,
   exams: deleteExam,
-  // announcement: deleteSubject,
+  event: deleteEvent,
+  announcement: deleteAnnouncement,
   // result: deleteSubject,
+  lessons: deleteLessons,
   grade: deleteGrade,
 }
 
@@ -114,6 +129,30 @@ const FormModel = ({ table, type, data, id, relatedData }) => {
     parent: (type, data, setOpen) => (
       <ParentForm type={type} data={data} setOpen={setOpen} />
     ),
+    event: (type, data, setOpen, relatedData) => (
+      <EventForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
+    ),
+    announcement: (type, data, setOpen, relatedData) => (
+      <AnnouncementForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
+    ),
+    lessons: (type, data, setOpen, relatedData) => (
+      <LessonForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
+    ),
   }
 
   const Form = () => {
@@ -126,10 +165,10 @@ const FormModel = ({ table, type, data, id, relatedData }) => {
     useEffect(() => {
       if (state.success) {
         toast.warning(`Data from ${table} deleted!`)
-        setOpen(false)
         router.refresh()
+        setOpen(false)
       }
-    }, [state, router])
+    }, [state, router, setOpen])
 
     return type === 'delete' && id ? (
       <form action={formAction} className='flex flex-col items-center gap-4'>
