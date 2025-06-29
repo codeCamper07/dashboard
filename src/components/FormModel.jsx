@@ -14,6 +14,7 @@ import {
   deleteGrade,
   deleteLessons,
   deleteParent,
+  deleteResult,
   deleteStudent,
   deleteSubject,
   deleteTeacher,
@@ -54,6 +55,9 @@ const AnnouncementForm = dynamic(() => import('./forms/AnnouncementForm'), {
 const LessonForm = dynamic(() => import('./forms/LessonForm'), {
   loading: () => <h1>Loading...!</h1>,
 })
+const ResultForm = dynamic(() => import('./forms/ResultForm'), {
+  loading: () => <h1>Loading...!</h1>,
+})
 
 const deleteActionMap = {
   subject: deleteSubject,
@@ -65,7 +69,7 @@ const deleteActionMap = {
   exams: deleteExam,
   event: deleteEvent,
   announcement: deleteAnnouncement,
-  // result: deleteSubject,
+  results: deleteResult,
   lessons: deleteLessons,
   grade: deleteGrade,
 }
@@ -147,6 +151,14 @@ const FormModel = ({ table, type, data, id, relatedData }) => {
     ),
     lessons: (type, data, setOpen, relatedData) => (
       <LessonForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
+    ),
+    results: (type, data, setOpen, relatedData) => (
+      <ResultForm
         type={type}
         data={data}
         setOpen={setOpen}

@@ -180,7 +180,6 @@ export const deleteTeacher = async (currentState, data) => {
 }
 export const createStudent = async (currentState, data) => {
   try {
-    console.log({ data })
     const classItem = await prisma.class.findUnique({
       where: { id: data.classId },
       include: {
@@ -227,7 +226,6 @@ export const createStudent = async (currentState, data) => {
 
 export const updateStudent = async (currentState, data) => {
   try {
-    console.log({ data })
     const res = await clerkClient()
     const user = await res.users.updateUser(data.id, {
       username: data.username,
@@ -265,7 +263,6 @@ export const updateStudent = async (currentState, data) => {
 }
 export const deleteStudent = async (currentState, data) => {
   try {
-    console.log({ data })
     const id = data.get('id')
 
     const res = await clerkClient()
@@ -501,8 +498,6 @@ export const deleteGrade = async (currentState, data) => {
 }
 export const createParent = async (currentState, data) => {
   try {
-    console.log({ data })
-
     const res = await clerkClient()
     const user = await res.users.createUser({
       username: data.username,
@@ -532,7 +527,6 @@ export const createParent = async (currentState, data) => {
 
 export const updateParent = async (currentState, data) => {
   try {
-    console.log({ data })
     const res = await clerkClient()
     const user = await res.users.updateUser(data.id, {
       username: data.username,
@@ -687,7 +681,6 @@ export const deleteAnnouncement = async (currentState, data) => {
 
 export const createLessons = async (currentState, data) => {
   try {
-    console.log(data)
     await prisma.lesson.create({
       data: {
         name: data.name,
@@ -735,6 +728,58 @@ export const deleteLessons = async (currentState, data) => {
   const id = data.get('id')
   try {
     await prisma.lesson.delete({
+      where: {
+        id: parseInt(id),
+      },
+    })
+    return { success: true, error: false }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true }
+  }
+}
+export const createResult = async (currentState, data) => {
+  try {
+    await prisma.result.create({
+      data: {
+        score: data.score,
+        examId: data.examId || null,
+        assignmentId: data.assignmentId || null,
+        studentId: data.studentId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (err) {
+    console.log({ err })
+    return { success: false, error: true, errorMessage: err.message }
+  }
+}
+export const updateResult = async (currentState, data) => {
+  try {
+    await prisma.result.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        score: data.score,
+        examId: data.examId || null,
+        assignmentId: data.assignmentId || null,
+        studentId: data.studentId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (err) {
+    console.log({ err })
+    return { success: false, error: true, errorMessage: err.message }
+  }
+}
+
+export const deleteResult = async (currentState, data) => {
+  const id = data.get('id')
+  try {
+    await prisma.result.delete({
       where: {
         id: parseInt(id),
       },

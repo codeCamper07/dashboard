@@ -26,7 +26,7 @@ const GradeForm = ({ type, data, setOpen }) => {
   const router = useRouter()
 
   const [state, formAction] = useActionState(
-    type === 'create' ? createGrade : updateAssignment,
+    type === 'create' ? createGrade : null,
     {
       success: false,
       error: false,

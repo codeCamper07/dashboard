@@ -9,8 +9,6 @@ import {
   BookText,
   ListTodo,
   FileCheck2,
-  ListChecks,
-  Calendar,
   Megaphone,
   CalendarHeart,
   ListOrdered,
@@ -106,18 +104,6 @@ const AppSidebar = async () => {
       visible: ['admin', 'teacher', 'student', 'parent'],
     },
     {
-      title: 'Attendance',
-      url: '#',
-      icon: ListChecks,
-      visible: ['admin', 'teacher', 'student', 'parent'],
-    },
-    {
-      title: 'Calender',
-      url: '#',
-      icon: Calendar,
-      visible: ['admin', 'teacher', 'student', 'parent'],
-    },
-    {
       title: 'Events',
       url: '/list/events',
       icon: CalendarHeart,
@@ -138,7 +124,7 @@ const AppSidebar = async () => {
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
               <Link href={`/${role}`}>
-                <Image src='/favicon.ico' width={30} height={30} alt='logo' />
+                <Image src='/school.png' width={30} height={30} alt='logo' />
                 <span>H-School</span>
               </Link>
             </SidebarMenuButton>
