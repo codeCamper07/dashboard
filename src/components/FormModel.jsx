@@ -212,7 +212,7 @@ const FormModel = ({ table, type, data, id, relatedData }) => {
       </Button>
       {open && (
         <div className='w-screen h-screen fixed top-0 left-0 bg-black/60 z-50 flex items-center justify-center'>
-          <div className='bg-secondary rounded-lg p-4 absolute w-[90%] md:w-[75%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] md:h-fit h-[90%] overflow-y-auto'>
+          <div className='bg-secondary rounded-lg p-4 absolute w-[90%] md:w-[75%] lg:w-[60%] xl:w-[50%] 2xl:w-[40%] md:h-fit h-[72%] overflow-y-auto'>
             <Form />
             <Image
               className='top-4 right-4 absolute cursor-pointer'
