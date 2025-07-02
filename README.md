@@ -2,7 +2,7 @@
 
 Super excited to share my latest full-stack project: Dashboard‑H‑School — a sleek, responsive admin dashboard built with a modern developer-first tech stack.
 
-Check it out live 👉 https://lnkd.in/eNtuANd6
+Check it out live 👉 https://dashboard-h-school.vercel.app/
 
 🌐 Username: admin , Password: admin
 
