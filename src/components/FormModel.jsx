@@ -8,6 +8,7 @@ import dynamic from 'next/dynamic'
 import {
   deleteAnnouncement,
   deleteAssignment,
+  deleteAttendance,
   deleteClass,
   deleteEvent,
   deleteExam,
@@ -58,6 +59,9 @@ const LessonForm = dynamic(() => import('./forms/LessonForm'), {
 const ResultForm = dynamic(() => import('./forms/ResultForm'), {
   loading: () => <h1>Loading...!</h1>,
 })
+const AttendanceForm = dynamic(() => import('./forms/AttendanceForm'), {
+  loading: () => <h1>Loading...!</h1>,
+})
 
 const deleteActionMap = {
   subject: deleteSubject,
@@ -72,6 +76,7 @@ const deleteActionMap = {
   results: deleteResult,
   lessons: deleteLessons,
   grade: deleteGrade,
+  attendance: deleteAttendance,
 }
 
 const FormModel = ({ table, type, data, id, relatedData }) => {
@@ -159,6 +164,14 @@ const FormModel = ({ table, type, data, id, relatedData }) => {
     ),
     results: (type, data, setOpen, relatedData) => (
       <ResultForm
+        type={type}
+        data={data}
+        setOpen={setOpen}
+        relatedData={relatedData}
+      />
+    ),
+    attendance: (type, data, setOpen, relatedData) => (
+      <AttendanceForm
         type={type}
         data={data}
         setOpen={setOpen}

@@ -12,6 +12,7 @@ import {
   Megaphone,
   CalendarHeart,
   ListOrdered,
+  ClipboardCheck,
 } from 'lucide-react'
 
 import {
@@ -101,6 +102,12 @@ const AppSidebar = async () => {
       title: 'Results',
       url: '/list/results',
       icon: FileCheck2,
+      visible: ['admin', 'teacher', 'student', 'parent'],
+    },
+    {
+      title: 'Attendance',
+      url: '/list/attendance',
+      icon: ClipboardCheck,
       visible: ['admin', 'teacher', 'student', 'parent'],
     },
     {

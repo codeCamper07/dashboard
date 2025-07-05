@@ -790,3 +790,110 @@ export const deleteResult = async (currentState, data) => {
     return { success: false, error: true }
   }
 }
+
+export const createAttendance = async (currentState, data) => {
+  const { userId, sessionClaims } = await auth()
+  const role = sessionClaims?.metadata.role
+
+  try {
+    if (role === 'teacher') {
+      const teacherLesson = await prisma.lesson.findFirst({
+        where: {
+          teacherId: userId,
+          id: data.lessonId,
+        },
+      })
+
+      if (!teacherLesson) {
+        return { success: false, error: true, errorMessage: 'You can only mark attendance for your own lessons' }
+      }
+    }
+
+    // Check if attendance record already exists for this student and lesson on this date
+    const existingAttendance = await prisma.attendance.findFirst({
+      where: {
+        studentId: data.studentId,
+        lessonId: data.lessonId,
+        date: {
+          gte: new Date(data.date),
+          lt: new Date(new Date(data.date).getTime() + 24 * 60 * 60 * 1000),
+        },
+      },
+    })
+
+    if (existingAttendance) {
+      return { success: false, error: true, errorMessage: 'Attendance already recorded for this student and lesson on this date' }
+    }
+
+    await prisma.attendance.create({
+      data: {
+        date: data.date,
+        present: data.present,
+        studentId: data.studentId,
+        lessonId: data.lessonId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true, errorMessage: err.message }
+  }
+}
+
+export const updateAttendance = async (currentState, data) => {
+  const { userId, sessionClaims } = await auth()
+  const role = sessionClaims?.metadata.role
+
+  try {
+    if (role === 'teacher') {
+      const teacherLesson = await prisma.lesson.findFirst({
+        where: {
+          teacherId: userId,
+          id: data.lessonId,
+        },
+      })
+
+      if (!teacherLesson) {
+        return { success: false, error: true, errorMessage: 'You can only update attendance for your own lessons' }
+      }
+    }
+
+    await prisma.attendance.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        date: data.date,
+        present: data.present,
+        studentId: data.studentId,
+        lessonId: data.lessonId,
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true, errorMessage: err.message }
+  }
+}
+
+export const deleteAttendance = async (currentState, data) => {
+  const id = data.get('id')
+  const { userId, sessionClaims } = await auth()
+  const role = sessionClaims?.metadata.role
+
+  try {
+    await prisma.attendance.delete({
+      where: {
+        id: parseInt(id),
+        ...(role === 'teacher' ? { lesson: { teacherId: userId } } : {}),
+      },
+    })
+
+    return { success: true, error: false }
+  } catch (err) {
+    console.log(err)
+    return { success: false, error: true, errorMessage: err.message }
+  }
+}
